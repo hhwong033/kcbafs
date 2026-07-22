@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>班級經濟與 MPF 投資系統</title>
+  <title>班級經濟與 DSE BAFS 企會財系統</title>
   <!-- 引入 Tailwind CSS 美化介面 -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -12,8 +12,8 @@
   <div class="max-w-md mx-auto p-4">
     <!-- 頁頭 -->
     <header class="text-center my-4">
-      <h1 class="text-2xl font-extrabold text-indigo-600">🏫 班級經濟與 MPF 系統</h1>
-      <p class="text-xs text-slate-500">學習．出糧．MPF強積金．理財投資</p>
+      <h1 class="text-2xl font-extrabold text-indigo-600">🏫 班級經濟 × DSE 企會財</h1>
+      <p class="text-xs text-slate-500">BAFS 卷一挑戰．MPF出糧結算．三戶口理財</p>
     </header>
 
     <!-- 1. 登入區塊 -->
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <!-- ================= 頁面 1：答題賺薪 ================= -->
+      <!-- ================= 頁面 1：DSE BAFS 答題賺薪 ================= -->
       <div id="tab-questions" class="tab-content space-y-4">
         <!-- 本月待出糧卡片 -->
         <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl flex justify-between items-center">
@@ -77,14 +77,23 @@
           <span class="text-2xl">💵</span>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-          <h3 class="font-bold text-indigo-600 mb-2 flex items-center gap-1">🎯 每日答題挑戰</h3>
-          <p class="text-sm text-slate-600 mb-3">題目：<strong>台灣最高峰是哪一座山？</strong> <br><span class="text-xs text-amber-600 font-bold">(答對獎酬 +$1,000 入本月待出糧)</span></p>
-          <div class="flex gap-2">
-            <input type="text" id="answer-input" placeholder="請輸入答案..." class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-            <button id="btn-submit-answer" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition">提交</button>
+        <!-- DSE BAFS 選擇題挑戰卡片 -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+            <span id="question-category" class="bg-indigo-100 text-indigo-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">DSE BAFS 卷一</span>
+            <span class="text-xs text-amber-600 font-bold">獎酬：+$1,000 (待出糧)</span>
           </div>
-          <p id="answer-feedback" class="text-xs mt-2 hidden"></p>
+
+          <p id="question-text" class="text-sm font-semibold text-slate-800 leading-relaxed">載入題目中...</p>
+
+          <!-- 4 個選項按鈕 (A, B, C, D) -->
+          <div id="options-container" class="space-y-2 pt-1">
+            <!-- 由 JS 動態生成選項 -->
+          </div>
+
+          <p id="answer-feedback" class="text-xs mt-2 p-2.5 rounded-lg hidden"></p>
+
+          <button id="btn-next-question" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded-lg text-xs transition mt-2 hidden">下一題 ➔</button>
         </div>
       </div>
 
@@ -239,6 +248,142 @@
     let unsubscribeUserDoc = null;
     let unsubscribeLedger = null;
 
+    // 📚 香港 DSE 企會財（BAFS）卷一題庫
+    const bafsQuestions = [
+      {
+        id: 1,
+        category: "DSE BAFS 卷一：會計導論",
+        question: "根據「業務個體概念」（Business Entity Concept），東主從獨資企業抽取現金作私人用途，會計上應記為以下哪項？",
+        options: [
+          { key: "A", text: "營業費用 (Expenses)" },
+          { key: "B", text: "提款 (Drawings)" },
+          { key: "C", text: "資本 (Capital)" },
+          { key: "D", text: "非流動負債 (Non-current Liabilities)" }
+        ],
+        answer: "B",
+        reward: 1000,
+        explanation: "業務個體概念規定企業與東主的財務必須分開處理，東主提取資金應列為『提款』以減少所有者權益。"
+      },
+      {
+        id: 2,
+        category: "DSE BAFS 卷一：管理基礎",
+        question: "經理正在評估員工的表現，並將實際業績與預設目標進行比較及修正差距。這屬於哪項基本管理功能？",
+        options: [
+          { key: "A", text: "計劃 (Planning)" },
+          { key: "B", text: "組織 (Organising)" },
+          { key: "C", text: "領導 (Leading)" },
+          { key: "D", text: "控制 (Controlling)" }
+        ],
+        answer: "D",
+        reward: 1000,
+        explanation: "控制（Controlling）是指設定標準、監察活動、比較實際績效與目標並作出糾正行動的過程。"
+      },
+      {
+        id: 3,
+        category: "DSE BAFS 卷一：商業環境",
+        question: "下列哪種香港企業組織形式中，業主需要對企業的所有債務承擔「無限法律責任」？",
+        options: [
+          { key: "A", text: "私人有限公司" },
+          { key: "B", text: "公眾有限公司" },
+          { key: "C", text: "獨資企業" },
+          { key: "D", text: "股份有限公司" }
+        ],
+        answer: "C",
+        reward: 1000,
+        explanation: "獨資企業的東主與企業在法律上為同一主體，東主需承擔無限法律責任。"
+      },
+      {
+        id: 4,
+        category: "DSE BAFS 卷一：個人理財",
+        question: "若一名月薪為 $16,000 的香港僱員，根據 MPF 法例，其每月『僱員強制性供款』金額應為多少？",
+        options: [
+          { key: "A", text: "$0" },
+          { key: "B", text: "$500" },
+          { key: "C", text: "$800" },
+          { key: "D", text: "$1,500" }
+        ],
+        answer: "C",
+        reward: 1000,
+        explanation: "月薪介乎 $7,100 至 $30,000 時，僱員強制性供款比率為 5%。$16,000 × 5% = $800。"
+      },
+      {
+        id: 5,
+        category: "DSE BAFS 卷一：會計導論",
+        question: "基本會計等式（Accounting Equation）的標準表達方式是：",
+        options: [
+          { key: "A", text: "資產 = 負債 + 所有者權益" },
+          { key: "B", text: "資產 + 負債 = 所有者權益" },
+          { key: "C", text: "負債 = 資產 + 所有者權益" },
+          { key: "D", text: "所有者權益 = 收入 - 費用" }
+        ],
+        answer: "A",
+        reward: 1000,
+        explanation: "基本會計等式為：資產 (Assets) = 負債 (Liabilities) + 所有者權益 (Capital)。"
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let isAnsweredCurrent = false;
+
+    // 渲染 BAFS 題目
+    function renderBAFSQuestion() {
+      const q = bafsQuestions[currentQuestionIndex];
+      document.getElementById('question-category').textContent = q.category;
+      document.getElementById('question-text').textContent = `${currentQuestionIndex + 1}. ${q.question}`;
+
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+      
+      const feedback = document.getElementById('answer-feedback');
+      feedback.classList.add('hidden');
+      document.getElementById('btn-next-question').classList.add('hidden');
+      isAnsweredCurrent = false;
+
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 text-xs font-semibold text-slate-700 transition flex items-center gap-2";
+        btn.innerHTML = `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">${opt.key}</span> ${opt.text}`;
+        btn.onclick = () => checkBAFSAnswer(opt.key);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    // 檢查 BAFS 答案與發放獎金
+    async function checkBAFSAnswer(selectedKey) {
+      if (isAnsweredCurrent) return;
+      isAnsweredCurrent = true;
+
+      const q = bafsQuestions[currentQuestionIndex];
+      const feedback = document.getElementById('answer-feedback');
+      feedback.classList.remove('hidden');
+
+      if (selectedKey === q.answer) {
+        feedback.className = "text-xs mt-2 p-2.5 rounded-lg bg-green-50 border border-green-200 text-green-700 font-bold";
+        feedback.innerHTML = `🎉 答對了！(答案：${q.answer})<br><span class="font-normal text-[11px] text-green-600">${q.explanation}</span><br><strong>+$${q.reward} 已記入本月待出糧金額！</strong>`;
+        
+        // 注入待出糧金額
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, { accrued_salary: increment(q.reward) });
+        await addDoc(collection(db, 'ledger'), {
+          student_email: currentUser.email,
+          amount: q.reward,
+          reason: `答對 BAFS 卷一題目 (${q.category.split('：')[1]})`,
+          created_at: new Date()
+        });
+      } else {
+        feedback.className = "text-xs mt-2 p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700";
+        feedback.innerHTML = `❌ 答錯了！正確答案是：<strong>${q.answer}</strong><br><span class="text-[11px]">${q.explanation}</span>`;
+      }
+
+      document.getElementById('btn-next-question').classList.remove('hidden');
+    }
+
+    // 下一題按鈕
+    document.getElementById('btn-next-question').addEventListener('click', () => {
+      currentQuestionIndex = (currentQuestionIndex + 1) % bafsQuestions.length;
+      renderBAFSQuestion();
+    });
+
     // 切換分頁函式
     window.switchTab = function(tabId, btnElement) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
@@ -252,6 +397,7 @@
       btnElement.classList.add('text-indigo-600', 'font-bold');
 
       if (tabId === 'tab-leaderboard') loadLeaderboard();
+      if (tabId === 'tab-questions') renderBAFSQuestion();
     }
 
     // 登入
@@ -279,6 +425,7 @@
 
         setupUserRealtime(user);
         loadLedger(user.email);
+        renderBAFSQuestion();
       } else {
         currentUser = null;
         if (unsubscribeUserDoc) unsubscribeUserDoc();
@@ -294,7 +441,6 @@
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
 
-      // 初始化全新使用者 (加入三大戶口 + 本月待出糧欄位)
       if (!userSnap.exists()) {
         await setDoc(userRef, {
           email: user.email,
@@ -311,7 +457,6 @@
         if (docSnap.exists()) {
           currentUserData = docSnap.data();
 
-          // 處理數據相容性 (若舊數據沒有三戶口則給預設值 0)
           const accrued = currentUserData.accrued_salary || 0;
           const current = currentUserData.current_account || currentUserData.current_salary || 0;
           const invest = currentUserData.investment_account || currentUserData.investment_balance || 0;
@@ -363,7 +508,7 @@
       }
     });
 
-    // 載入全班總財富排行榜 (活期 + 投資 + MPF)
+    // 載入全班總財富排行榜
     async function loadLeaderboard() {
       const leaderboardList = document.getElementById('leaderboard-list');
       leaderboardList.innerHTML = '<p class="text-slate-400 text-center py-2">載入中...</p>';
@@ -381,12 +526,10 @@
 
           studentList.push({
             displayName: data.display_name || data.email.split('@')[0],
-            totalWealth: totalWealth,
-            current: current
+            totalWealth: totalWealth
           });
         });
 
-        // 依總財富降序排序
         studentList.sort((a, b) => b.totalWealth - a.totalWealth);
 
         leaderboardList.innerHTML = '';
@@ -438,30 +581,6 @@
         });
       });
     }
-
-    // 答題邏輯 (金額注入 accrued_salary)
-    document.getElementById('btn-submit-answer').addEventListener('click', async () => {
-      const input = document.getElementById('answer-input').value.trim();
-      const feedback = document.getElementById('answer-feedback');
-      feedback.classList.remove('hidden');
-
-      if (input === "玉山") {
-        feedback.className = "text-xs mt-2 text-green-600 font-bold";
-        feedback.textContent = "🎉 答對了！$1,000 已記入本月待出糧金額（月底結算）！";
-        
-        const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, { accrued_salary: increment(1000) });
-        await addDoc(collection(db, 'ledger'), {
-          student_email: currentUser.email,
-          amount: 1000,
-          reason: "答對問題 (記入待出糧薪金)",
-          created_at: new Date()
-        });
-      } else {
-        feedback.className = "text-xs mt-2 text-red-500";
-        feedback.textContent = "❌ 答案不正確，再試一次！";
-      }
-    });
 
     // 投資中心：轉入存款 (活期 -> 投資)
     document.getElementById('btn-invest-deposit').addEventListener('click', async () => {
@@ -537,7 +656,7 @@
       document.getElementById('invest-input-amount').value = '';
     });
 
-    // 老師手動上記薪金 (注入 accrued_salary)
+    // 老師手動上記薪金
     document.getElementById('btn-admin-adjust').addEventListener('click', async () => {
       const targetEmail = document.getElementById('admin-target-email').value.trim();
       const amount = parseInt(document.getElementById('admin-amount').value);
@@ -588,35 +707,29 @@
           const grossSalary = data.accrued_salary || 0;
 
           if (grossSalary > 0) {
-            // 香港 MPF 法例計算邏輯
             let employeeMPF = 0;
             let employerMPF = 0;
 
             if (grossSalary < 7100) {
-              // 免供款界線：僱員 $0，僱主 5%
               employeeMPF = 0;
               employerMPF = Math.round(grossSalary * 0.05);
             } else if (grossSalary <= 30000) {
-              // 標準界線：雙方各 5%
               employeeMPF = Math.round(grossSalary * 0.05);
               employerMPF = Math.round(grossSalary * 0.05);
             } else {
-              // 上限界線 ($30,000 上限)
               employeeMPF = 1500;
               employerMPF = 1500;
             }
 
-            const netSalary = grossSalary - employeeMPF; // 扣除 MPF 後實收薪金 (入活期)
-            const totalMPFContribution = employeeMPF + employerMPF; // 總強積金注入
+            const netSalary = grossSalary - employeeMPF;
+            const totalMPFContribution = employeeMPF + employerMPF;
 
-            // 更新數據：Reset 待出糧，注入活期與 MPF 戶口
             await updateDoc(doc(db, 'users', studentDoc.id), {
               accrued_salary: 0,
               current_account: increment(netSalary),
               mpf_account: increment(totalMPFContribution)
             });
 
-            // 寫入交易紀錄
             await addDoc(collection(db, 'ledger'), {
               student_email: data.email,
               amount: netSalary,
