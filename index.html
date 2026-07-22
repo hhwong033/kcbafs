@@ -168,20 +168,17 @@
           </div>
         </div>
 
-        <!-- 📰 雙週重大市場新聞事件選單 (不重複機制) -->
-        <div class="bg-indigo-900 text-white p-4 rounded-2xl shadow-md space-y-2">
-          <div class="flex justify-between items-center border-b border-indigo-800 pb-2">
-            <h3 class="text-xs font-bold text-indigo-200 flex items-center gap-1">📢 雙週重大市場事件影響</h3>
-            <span class="text-[10px] bg-indigo-800 text-indigo-300 px-2 py-0.5 rounded">每 2 週更新一次</span>
+        <!-- 📰 本雙週自動重大新聞公告 (系統自動觸發，不可手動選) -->
+        <div class="bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-950 text-white p-4 rounded-2xl shadow-md space-y-2 border border-indigo-700">
+          <div class="flex justify-between items-center border-b border-indigo-700/60 pb-2">
+            <span class="text-xs font-extrabold text-amber-300 flex items-center gap-1">📢 本雙週焦點市場新聞（系統自動觸發）</span>
+            <span class="text-[10px] bg-indigo-800 text-indigo-200 px-2 py-0.5 rounded font-semibold">每 14 天自動更替</span>
           </div>
-          <div>
-            <label class="block text-[11px] text-indigo-300 mb-1 font-semibold">切換雙週新聞事件：</label>
-            <select id="biweekly-event-select" class="w-full px-2.5 py-1.5 border border-indigo-700 rounded-lg text-xs bg-indigo-950 text-indigo-100 font-semibold outline-none">
-              <!-- JS 動態填入雙週事件 -->
-            </select>
-          </div>
-          <div id="event-explanation-box" class="bg-indigo-950/80 p-3 rounded-xl border border-indigo-800/80 text-xs text-indigo-100 space-y-1">
-            <!-- 顯示事件邏輯解釋 -->
+          
+          <h4 id="event-title-display" class="font-extrabold text-sm text-white pt-1">載入新聞中...</h4>
+          
+          <div id="event-explanation-box" class="bg-indigo-950/70 p-3 rounded-xl border border-indigo-800/80 text-xs text-indigo-100 leading-relaxed space-y-1">
+            <!-- 顯示事件影響與商業邏輯解釋 -->
           </div>
         </div>
 
@@ -342,46 +339,49 @@
       { code: "3690", name: "美團 (Meituan)", sector: "工商業", basePrice: 115.00, lotSize: 100 }
     ];
 
-    // 📰 雙週不重複重大市場事件庫 (重大消息影響股價)
+    // 📰 雙週自動輪替不重複新聞事件庫
     const biweeklyEvents = [
       {
-        id: "event-w1-2",
-        title: "第 1-2 週：騰訊發布全新 AI 晶片突破，國際機構大舉加碼",
+        title: "騰訊發布全新 AI 晶片突破，國際機構大舉加碼",
         targetCode: "0700",
         multiplier: 1.18, // +18%
         explanation: "<b>【利好理由】</b>騰訊自主研發的 AI 大模型晶片獲得全球科技巨頭訂單，商業化進展超預期，大幅提升業務毛利，引發外資機構搶購。"
       },
       {
-        id: "event-w3-4",
-        title: "第 3-4 週：中東地緣局勢緊張，天然氣價格大漲",
+        title: "中東地緣局勢緊張，國際天然氣價格大漲",
         targetCode: "0002",
         multiplier: 0.88, // -12%
         explanation: "<b>【利空理由】</b>國際能源價格激增 40%，電力公司燃料採購成本暴增，而發電加價受政府審核延遲，短期盈利嚴重承壓。"
       },
       {
-        id: "event-w5-6",
-        title: "第 5-6 週：特區政府宣佈放寬樓市印花稅與按揭上限",
+        title: "特區政府宣佈全面『撤辣』，放寬樓市按揭上限",
         targetCode: "0016",
         multiplier: 1.15, // +15%
-        explanation: "<b>【利好理由】</b>全面『撤辣』政策帶動樓市成交量急升，新鴻基地產旗下豪宅及商業地產出租率達 95%，資產重估價值大增。"
+        explanation: "<b>【利好理由】</b>全面撤銷樓市印花稅帶動成交量急升，新鴻基地產旗下豪宅及商業地產出租率達 95%，資產重估價值大增。"
       },
       {
-        id: "event-w7-8",
-        title: "第 7-8 週：全球央行超預期降息 50 個基點",
+        title: "全球央行超預期降息 50 個基點",
         targetCode: "0005",
         multiplier: 0.92, // -8%
         explanation: "<b>【利空理由】</b>市場利率下降導致銀行『淨息差 (NIM)』收窄，直接減少商業銀行的淨利息收入，吸引獲利盤拋售。"
       },
       {
-        id: "event-w9-10",
-        title: "第 9-10 週：阿里巴巴海外電商拓展順利，利潤增長雙倍",
+        title: "阿里巴巴海外電商拓展順利，利潤增長雙倍",
         targetCode: "9988",
         multiplier: 1.20, // +20%
-        explanation: "<b>【利好理由】</b>阿里國際數位商業集團營收暴增 45%，物流物流成本大幅降低，集團宣佈大舉回購股份，推升股價。"
+        explanation: "<b>【利好理由】</b>阿里國際數位商業集團營收暴增 45%，物流成本大幅降低，集團宣佈大舉回購股份，強勢推升股價。"
       }
     ];
 
-    let activeEvent = biweeklyEvents[0];
+    // ⚙️ 根據當前真實日期，每 14 天自動切換事件 (學生不可選擇)
+    function getCurrentBiweeklyEvent() {
+      const epoch = new Date("2026-01-01").getTime(); // 基準時間
+      const now = Date.now();
+      const diffDays = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
+      const cycleIndex = Math.floor(diffDays / 14); // 每 14 天為一個週期
+      const eventIndex = Math.abs(cycleIndex) % biweeklyEvents.length;
+      return biweeklyEvents[eventIndex];
+    }
 
     // 計算當前真實港股交易時間
     function checkHKMarketTradingHours() {
@@ -426,28 +426,10 @@
       }
     }
 
-    // 初始化雙週事件下拉選單
-    function initEventSelectUI() {
-      const select = document.getElementById('biweekly-event-select');
-      select.innerHTML = '';
-      biweeklyEvents.forEach((evt) => {
-        const opt = document.createElement('option');
-        opt.value = evt.id;
-        opt.textContent = evt.title;
-        select.appendChild(opt);
-      });
-
-      select.addEventListener('change', (e) => {
-        const found = biweeklyEvents.find(evt => evt.id === e.target.value);
-        if (found) {
-          activeEvent = found;
-          renderStockMarketUI();
-        }
-      });
-    }
-
-    // 動態計算受到雙週事件影響後的 10 隻股票數據
+    // 動態計算受到當前自動雙週事件影響後的 10 隻股票價格
     function getAdjustedStocks() {
+      const activeEvent = getCurrentBiweeklyEvent();
+
       return baseStocks.map(stock => {
         let price = stock.basePrice;
         let changePct = 0;
@@ -640,7 +622,6 @@
         mainDashboard.classList.remove('hidden');
         bottomNav.classList.remove('hidden');
 
-        initEventSelectUI();
         setupUserRealtime(user);
         loadLedger(user.email);
         renderBAFSQuestion();
@@ -750,10 +731,12 @@
         statusBadge.className = "text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-bold";
       }
 
-      // 2. 顯示雙週事件解釋
+      // 2. 顯示自動計算之當前雙週新聞標題與商業邏輯解釋
+      const activeEvent = getCurrentBiweeklyEvent();
+      document.getElementById('event-title-display').textContent = activeEvent.title;
       document.getElementById('event-explanation-box').innerHTML = activeEvent.explanation;
 
-      // 3. 取得動態調整後的 10 隻股票
+      // 3. 取得自動新聞影響後的 10 隻股票
       const currentStocks = getAdjustedStocks();
 
       // 4. 渲染我的持倉
