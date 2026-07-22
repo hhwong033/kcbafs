@@ -13,7 +13,7 @@
     <!-- 頁頭 -->
     <header class="text-center my-4">
       <h1 class="text-2xl font-extrabold text-indigo-600">🏫 班級經濟 × DSE 企會財</h1>
-      <p class="text-xs text-slate-500">BAFS 卷一挑戰．港股模擬交易．MPF出糧結算</p>
+      <p class="text-xs text-slate-500">BAFS 卷一無限挑戰．選項動態洗牌．港股模擬交易</p>
     </header>
 
     <!-- 1. 登入區塊 -->
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <!-- ================= 頁面 1：DSE BAFS 答題賺薪 ================= -->
+      <!-- ================= 頁面 1：DSE BAFS 答題賺薪 (隨機洗牌與題庫) ================= -->
       <div id="tab-questions" class="tab-content space-y-4">
         <!-- 本月待出糧卡片 -->
         <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl flex justify-between items-center">
@@ -86,14 +86,14 @@
 
           <p id="question-text" class="text-sm font-semibold text-slate-800 leading-relaxed">載入題目中...</p>
 
-          <!-- 4 個選項按鈕 (A, B, C, D) -->
+          <!-- 4 個動態洗牌選項按鈕 (A, B, C, D) -->
           <div id="options-container" class="space-y-2 pt-1">
-            <!-- 由 JS 動態生成選項 -->
+            <!-- 由 JS 動態洗牌後生成選項 -->
           </div>
 
           <p id="answer-feedback" class="text-xs mt-2 p-2.5 rounded-lg hidden"></p>
 
-          <button id="btn-next-question" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded-lg text-xs transition mt-2 hidden">下一題 ➔</button>
+          <button id="btn-next-question" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded-lg text-xs transition mt-2 hidden">下一題 (隨機抽題與洗牌) ➔</button>
         </div>
       </div>
 
@@ -168,7 +168,7 @@
           </div>
         </div>
 
-        <!-- 📰 本雙週自動重大新聞公告 (系統自動觸發，不可手動選) -->
+        <!-- 📰 本雙週自動重大新聞公告 -->
         <div class="bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-950 text-white p-4 rounded-2xl shadow-md space-y-2 border border-indigo-700">
           <div class="flex justify-between items-center border-b border-indigo-700/60 pb-2">
             <span class="text-xs font-extrabold text-amber-300 flex items-center gap-1">📢 本雙週焦點市場新聞（系統自動觸發）</span>
@@ -227,7 +227,6 @@
           <div class="flex flex-col gap-2">
             <h3 class="font-bold text-slate-700 text-xs">🏬 香港模擬股票市場 (10 隻指標股)</h3>
             
-            <!-- 下拉式選單 (Pull-down Menu) & 搜尋框 -->
             <div class="grid grid-cols-2 gap-2">
               <select id="sector-filter" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-slate-50 font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="ALL">全部行業 (All Sectors)</option>
@@ -325,7 +324,7 @@
     let unsubscribeUserDoc = null;
     let unsubscribeLedger = null;
 
-    // 基礎股票基準價 (遊戲模擬股價)
+    // 基礎股票基準價
     const baseStocks = [
       { code: "0005", name: "匯豐控股 (HSBC)", sector: "金融業", basePrice: 65.00, lotSize: 400 },
       { code: "1299", name: "友邦保險 (AIA)", sector: "金融業", basePrice: 55.00, lotSize: 200 },
@@ -339,73 +338,65 @@
       { code: "3690", name: "美團 (Meituan)", sector: "工商業", basePrice: 115.00, lotSize: 100 }
     ];
 
-    // 📰 雙週自動輪替不重複新聞事件庫
+    // 📰 雙週自動輪替新聞事件庫
     const biweeklyEvents = [
       {
         title: "騰訊發布全新 AI 晶片突破，國際機構大舉加碼",
         targetCode: "0700",
-        multiplier: 1.18, // +18%
+        multiplier: 1.18,
         explanation: "<b>【利好理由】</b>騰訊自主研發的 AI 大模型晶片獲得全球科技巨頭訂單，商業化進展超預期，大幅提升業務毛利，引發外資機構搶購。"
       },
       {
         title: "中東地緣局勢緊張，國際天然氣價格大漲",
         targetCode: "0002",
-        multiplier: 0.88, // -12%
+        multiplier: 0.88,
         explanation: "<b>【利空理由】</b>國際能源價格激增 40%，電力公司燃料採購成本暴增，而發電加價受政府審核延遲，短期盈利嚴重承壓。"
       },
       {
         title: "特區政府宣佈全面『撤辣』，放寬樓市按揭上限",
         targetCode: "0016",
-        multiplier: 1.15, // +15%
+        multiplier: 1.15,
         explanation: "<b>【利好理由】</b>全面撤銷樓市印花稅帶動成交量急升，新鴻基地產旗下豪宅及商業地產出租率達 95%，資產重估價值大增。"
       },
       {
         title: "全球央行超預期降息 50 個基點",
         targetCode: "0005",
-        multiplier: 0.92, // -8%
+        multiplier: 0.92,
         explanation: "<b>【利空理由】</b>市場利率下降導致銀行『淨息差 (NIM)』收窄，直接減少商業銀行的淨利息收入，吸引獲利盤拋售。"
       },
       {
         title: "阿里巴巴海外電商拓展順利，利潤增長雙倍",
         targetCode: "9988",
-        multiplier: 1.20, // +20%
+        multiplier: 1.20,
         explanation: "<b>【利好理由】</b>阿里國際數位商業集團營收暴增 45%，物流成本大幅降低，集團宣佈大舉回購股份，強勢推升股價。"
       }
     ];
 
-    // ⚙️ 根據當前真實日期，每 14 天自動切換事件 (學生不可選擇)
     function getCurrentBiweeklyEvent() {
-      const epoch = new Date("2026-01-01").getTime(); // 基準時間
+      const epoch = new Date("2026-01-01").getTime();
       const now = Date.now();
       const diffDays = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
-      const cycleIndex = Math.floor(diffDays / 14); // 每 14 天為一個週期
+      const cycleIndex = Math.floor(diffDays / 14);
       const eventIndex = Math.abs(cycleIndex) % biweeklyEvents.length;
       return biweeklyEvents[eventIndex];
     }
 
-    // 計算當前真實港股交易時間
     function checkHKMarketTradingHours() {
       const now = new Date();
-      // 轉為香港時間 UTC+8
       const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
       const hkTime = new Date(utc + (3600000 * 8));
 
-      const day = hkTime.getDay(); // 0: 日, 6: 六
+      const day = hkTime.getDay();
       const hours = hkTime.getHours();
       const minutes = hkTime.getMinutes();
       const timeVal = hours * 100 + minutes;
 
-      // 週末休市
       if (day === 0 || day === 6) return false;
-
-      // 香港交易時間：09:30 - 12:00 或 13:00 - 16:00
       const isMorningSession = (timeVal >= 930 && timeVal < 1200);
       const isAfternoonSession = (timeVal >= 1300 && timeVal < 1600);
-
       return isMorningSession || isAfternoonSession;
     }
 
-    // 抓取真實恒生指數數據 (Yahoo Finance Proxy 或系統擬真)
     async function fetchRealHSI() {
       try {
         const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/^HSI?interval=1d'));
@@ -420,46 +411,37 @@
         document.getElementById('hsi-change').textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%)`;
         document.getElementById('hsi-change').className = `text-xs font-semibold ${change >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
       } catch (err) {
-        // Fallback 近期數據
         document.getElementById('hsi-points').textContent = "25,132.29";
         document.getElementById('hsi-change').textContent = "-10.76 (-0.04%)";
       }
     }
 
-    // 動態計算受到當前自動雙週事件影響後的 10 隻股票價格
     function getAdjustedStocks() {
       const activeEvent = getCurrentBiweeklyEvent();
-
       return baseStocks.map(stock => {
         let price = stock.basePrice;
         let changePct = 0;
-
         if (stock.code === activeEvent.targetCode) {
           price = Math.round(stock.basePrice * activeEvent.multiplier * 100) / 100;
           changePct = Math.round((activeEvent.multiplier - 1) * 100);
         }
-
-        return {
-          ...stock,
-          price: price,
-          changePct: changePct
-        };
+        return { ...stock, price, changePct };
       });
     }
 
-    // 📚 香港 DSE 企會財（BAFS）卷一題庫
+    // ================= 📚 香港 DSE 企會財（BAFS）卷一大題庫結構 =================
+    // 選項改為 { text: "...", isCorrect: boolean } 格式，方便隨機洗牌！
     const bafsQuestions = [
       {
         id: 1,
         category: "DSE BAFS 卷一：會計導論",
         question: "根據「業務個體概念」（Business Entity Concept），東主從獨資企業抽取現金作私人用途，會計上應記為以下哪項？",
         options: [
-          { key: "A", text: "營業費用 (Expenses)" },
-          { key: "B", text: "提款 (Drawings)" },
-          { key: "C", text: "資本 (Capital)" },
-          { key: "D", text: "非流動負債 (Non-current Liabilities)" }
+          { text: "提款 (Drawings)", isCorrect: true },
+          { text: "營業費用 (Expenses)", isCorrect: false },
+          { text: "資本 (Capital)", isCorrect: false },
+          { text: "非流動負債 (Non-current Liabilities)", isCorrect: false }
         ],
-        answer: "B",
         reward: 1000,
         explanation: "業務個體概念規定企業與東主的財務必須分開處理，東主提取資金應列為『提款』以減少所有者權益。"
       },
@@ -468,12 +450,11 @@
         category: "DSE BAFS 卷一：管理基礎",
         question: "經理正在評估員工的表現，並將實際業績與預設目標進行比較及修正差距。這屬於哪項基本管理功能？",
         options: [
-          { key: "A", text: "計劃 (Planning)" },
-          { key: "B", text: "組織 (Organising)" },
-          { key: "C", text: "領導 (Leading)" },
-          { key: "D", text: "控制 (Controlling)" }
+          { text: "控制 (Controlling)", isCorrect: true },
+          { text: "計劃 (Planning)", isCorrect: false },
+          { text: "組織 (Organising)", isCorrect: false },
+          { text: "領導 (Leading)", isCorrect: false }
         ],
-        answer: "D",
         reward: 1000,
         explanation: "控制（Controlling）是指設定標準、監察活動、比較實際績效與目標並作出糾正行動的過程。"
       },
@@ -482,12 +463,11 @@
         category: "DSE BAFS 卷一：商業環境",
         question: "下列哪種香港企業組織形式中，業主需要對企業的所有債務承擔「無限法律責任」？",
         options: [
-          { key: "A", text: "私人有限公司" },
-          { key: "B", text: "公眾有限公司" },
-          { key: "C", text: "獨資企業" },
-          { key: "D", text: "股份有限公司" }
+          { text: "獨資企業", isCorrect: true },
+          { text: "私人有限公司", isCorrect: false },
+          { text: "公眾有限公司", isCorrect: false },
+          { text: "股份有限公司", isCorrect: false }
         ],
-        answer: "C",
         reward: 1000,
         explanation: "獨資企業的東主與企業在法律上為同一主體，東主需承擔無限法律責任。"
       },
@@ -496,12 +476,11 @@
         category: "DSE BAFS 卷一：個人理財",
         question: "若一名月薪為 $16,000 的香港僱員，根據 MPF 法例，其每月『僱員強制性供款』金額應為多少？",
         options: [
-          { key: "A", text: "$0" },
-          { key: "B", text: "$500" },
-          { key: "C", text: "$800" },
-          { key: "D", text: "$1,500" }
+          { text: "$800", isCorrect: true },
+          { text: "$0", isCorrect: false },
+          { text: "$500", isCorrect: false },
+          { text: "$1,500", isCorrect: false }
         ],
-        answer: "C",
         reward: 1000,
         explanation: "月薪介乎 $7,100 至 $30,000 時，僱員強制性供款比率為 5%。$16,000 × 5% = $800。"
       },
@@ -510,25 +489,101 @@
         category: "DSE BAFS 卷一：會計導論",
         question: "基本會計等式（Accounting Equation）的標準表達方式是：",
         options: [
-          { key: "A", text: "資產 = 負債 + 所有者權益" },
-          { key: "B", text: "資產 + 負債 = 所有者權益" },
-          { key: "C", text: "負債 = 資產 + 所有者權益" },
-          { key: "D", text: "所有者權益 = 收入 - 費用" }
+          { text: "資產 = 負債 + 所有者權益", isCorrect: true },
+          { text: "資產 + 負債 = 所有者權益", isCorrect: false },
+          { text: "負債 = 資產 + 所有者權益", isCorrect: false },
+          { text: "所有者權益 = 收入 - 費用", isCorrect: false }
         ],
-        answer: "A",
         reward: 1000,
         explanation: "基本會計等式為：資產 (Assets) = 負債 (Liabilities) + 所有者權益 (Capital)。"
+      },
+      {
+        id: 6,
+        category: "DSE BAFS 卷一：商業環境",
+        question: "根據香港《公司條例》，私人有限公司的股東人數上限是多少人？",
+        options: [
+          { text: "50 人", isCorrect: true },
+          { text: "20 人", isCorrect: false },
+          { text: "100 人", isCorrect: false },
+          { text: "沒有上限", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "香港私人有限公司的股東人數上限為 50 人，且股份不能向公眾公開發售。"
+      },
+      {
+        id: 7,
+        category: "DSE BAFS 卷一：會計導論",
+        question: "「歷史成本概念」（Historical Cost Concept）是指資產應以什麼價值在財務報表中記錄？",
+        options: [
+          { text: "購買時的實際取得成本", isCorrect: true },
+          { text: "現時的市場重置價值", isCorrect: false },
+          { text: "預期的未來賣出價格", isCorrect: false },
+          { text: "扣除清算費用後的淨值", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "歷史成本概念規定資產應以交易發生時的實際購置成本入賬，不受後續市場價格波動影響。"
+      },
+      {
+        id: 8,
+        category: "DSE BAFS 卷一：管理基礎",
+        question: "在 SWOT 分析中，企業內部的優勢與劣勢（S & W）主要源自於哪裡？",
+        options: [
+          { text: "企業內部的資源與能力", isCorrect: true },
+          { text: "宏觀經濟與政府政策", isCorrect: false },
+          { text: "行業競爭對手的戰略動作", isCorrect: false },
+          { text: "全球供應鏈與國際貿易環境", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "SWOT 中，Strengths (優勢) 與 Weaknesses (劣勢) 屬於內部環境分析；Opportunities (機會) 與 Threats (威脅) 屬於外部環境分析。"
+      },
+      {
+        id: 9,
+        category: "DSE BAFS 卷一：個人理財",
+        question: "風險與回報成正比關係。下列哪項投資工具在正常情況下風險最高但潛在回報亦最高？",
+        options: [
+          { text: "普通股票 (Equities)", isCorrect: true },
+          { text: "銀行定期存款 (Time Deposit)", isCorrect: false },
+          { text: "政府外匯基金債券 (Bonds)", isCorrect: false },
+          { text: "儲蓄戶口存款", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "股票的價格波動較大，風險較債券與定期存款高，但長期潛在資本升值回報亦相對最高。"
+      },
+      {
+        id: 10,
+        category: "DSE BAFS 卷一：會計導論",
+        question: "下列哪項屬於企業的「流動資產」(Current Asset)？",
+        options: [
+          { text: "應收賬款 (Trade Debtors / Accounts Receivable)", isCorrect: true },
+          { text: "辦公室物業 (Premises)", isCorrect: false },
+          { text: "機器與設備 (Machinery)", isCorrect: false },
+          { text: "應付賬款 (Trade Creditors / Accounts Payable)", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "應收賬款預計會在一年（或一個營業週期）內變現，故屬於流動資產。"
       }
+      // 💡 老師可在此處持續新增至 100+ 題！
     ];
 
     let currentQuestionIndex = 0;
+    let currentShuffledOptions = [];
     let isAnsweredCurrent = false;
 
-    // 渲染 BAFS 題目
+    // 🎲 Fisher-Yates 陣列隨機洗牌演算法
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // 渲染 BAFS 題目（選項動態洗牌）
     function renderBAFSQuestion() {
       const q = bafsQuestions[currentQuestionIndex];
       document.getElementById('question-category').textContent = q.category;
-      document.getElementById('question-text').textContent = `${currentQuestionIndex + 1}. ${q.question}`;
+      document.getElementById('question-text').textContent = `[第 ${currentQuestionIndex + 1} 題] ${q.question}`;
 
       const optionsContainer = document.getElementById('options-container');
       optionsContainer.innerHTML = '';
@@ -538,47 +593,61 @@
       document.getElementById('btn-next-question').classList.add('hidden');
       isAnsweredCurrent = false;
 
-      q.options.forEach(opt => {
+      // 🔀 每次顯示題目時，將 4 個選項隨機打亂順序！
+      currentShuffledOptions = shuffleArray(q.options);
+      const labels = ['A', 'B', 'C', 'D'];
+
+      currentShuffledOptions.forEach((opt, index) => {
+        const key = labels[index];
         const btn = document.createElement('button');
         btn.className = "w-full text-left p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 text-xs font-semibold text-slate-700 transition flex items-center gap-2";
-        btn.innerHTML = `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">${opt.key}</span> ${opt.text}`;
-        btn.onclick = () => checkBAFSAnswer(opt.key);
+        btn.innerHTML = `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">${key}</span> ${opt.text}`;
+        btn.onclick = () => checkBAFSAnswer(index, key);
         optionsContainer.appendChild(btn);
       });
     }
 
-    // 檢查 BAFS 答案
-    async function checkBAFSAnswer(selectedKey) {
+    // 檢查 BAFS 答案（根據動態洗牌後的索引）
+    async function checkBAFSAnswer(shuffledIndex, clickedKey) {
       if (isAnsweredCurrent) return;
       isAnsweredCurrent = true;
 
       const q = bafsQuestions[currentQuestionIndex];
+      const selectedOption = currentShuffledOptions[shuffledIndex];
       const feedback = document.getElementById('answer-feedback');
       feedback.classList.remove('hidden');
 
-      if (selectedKey === q.answer) {
+      // 尋找正確答案文字
+      const correctOption = q.options.find(o => o.isCorrect);
+
+      if (selectedOption.isCorrect) {
         feedback.className = "text-xs mt-2 p-2.5 rounded-lg bg-green-50 border border-green-200 text-green-700 font-bold";
-        feedback.innerHTML = `🎉 答對了！(答案：${q.answer})<br><span class="font-normal text-[11px] text-green-600">${q.explanation}</span><br><strong>+$${q.reward} 已記入本月待出糧金額！</strong>`;
+        feedback.innerHTML = `🎉 答對了！(你選擇了 ${clickedKey}: ${selectedOption.text})<br><span class="font-normal text-[11px] text-green-600">${q.explanation}</span><br><strong>+$${q.reward} 已記入本月待出糧金額！</strong>`;
         
         const userRef = doc(db, 'users', currentUser.uid);
         await updateDoc(userRef, { accrued_salary: increment(q.reward) });
         await addDoc(collection(db, 'ledger'), {
           student_email: currentUser.email,
           amount: q.reward,
-          reason: `答對 BAFS 卷一題目 (${q.category.split('：')[1]})`,
+          reason: `答對 BAFS 題目 (${q.category.split('：')[1]})`,
           created_at: new Date()
         });
       } else {
         feedback.className = "text-xs mt-2 p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700";
-        feedback.innerHTML = `❌ 答錯了！正確答案是：<strong>${q.answer}</strong><br><span class="text-[11px]">${q.explanation}</span>`;
+        feedback.innerHTML = `❌ 答錯了！正確答案是：<strong>${correctOption.text}</strong><br><span class="text-[11px]">${q.explanation}</span>`;
       }
 
       document.getElementById('btn-next-question').classList.remove('hidden');
     }
 
-    // 下一題按鈕
+    // 下一題按鈕（隨機抽題或循環，且重新觸發洗牌）
     document.getElementById('btn-next-question').addEventListener('click', () => {
-      currentQuestionIndex = (currentQuestionIndex + 1) % bafsQuestions.length;
+      // 隨機抽選下一題，讓重複挑戰更具趣味性
+      let nextIndex = Math.floor(Math.random() * bafsQuestions.length);
+      if (nextIndex === currentQuestionIndex) {
+        nextIndex = (currentQuestionIndex + 1) % bafsQuestions.length;
+      }
+      currentQuestionIndex = nextIndex;
       renderBAFSQuestion();
     });
 
@@ -636,7 +705,6 @@
       }
     });
 
-    // 計算使用者股票總市值
     function calculateStockPortfolioValue(userStocksObj) {
       if (!userStocksObj) return 0;
       let totalValue = 0;
@@ -650,7 +718,6 @@
       return Math.round(totalValue);
     }
 
-    // 即時監聽個人資料與戶口
     async function setupUserRealtime(user) {
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
@@ -659,11 +726,11 @@
         await setDoc(userRef, {
           email: user.email,
           display_name: "",
-          accrued_salary: 0,        // 本月待出糧
-          current_account: 0,       // 活期戶口
-          investment_cash: 0,       // 投資戶口現金
-          stocks: {},               // 持有股票手數/股數 Map
-          mpf_account: 0,           // 強積金戶口
+          accrued_salary: 0,
+          current_account: 0,
+          investment_cash: 0,
+          stocks: {},
+          mpf_account: 0,
           is_admin: false
         });
       }
@@ -686,12 +753,10 @@
           investmentAccountAmount.textContent = totalInvest;
           mpfAccountAmount.textContent = mpf;
 
-          // 更新投資中心 UI 數據
           document.getElementById('invest-cash-balance').textContent = investCash;
           document.getElementById('invest-stock-value').textContent = stockValue;
           document.getElementById('invest-total-asset').textContent = totalInvest;
 
-          // 首次登入姓名檢查
           if (!currentUserData.display_name || currentUserData.display_name.trim() === "") {
             document.getElementById('name-modal').classList.remove('hidden');
           } else {
@@ -699,7 +764,6 @@
             userDisplayName.textContent = `${currentUserData.display_name} (${user.email.split('@')[0]})`;
           }
 
-          // 管理員身份
           if (currentUserData.is_admin) {
             userRoleBadge.textContent = "老師/管理員";
             userRoleBadge.className = "text-[10px] inline-block bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold";
@@ -710,7 +774,6 @@
             document.getElementById('admin-panel').classList.add('hidden');
           }
 
-          // 如果目前在投資頁面，同步刷新持倉
           if (!document.getElementById('tab-investment').classList.contains('hidden')) {
             renderStockMarketUI();
           }
@@ -718,9 +781,7 @@
       });
     }
 
-    // 渲染股票市場與持倉列表 UI
     function renderStockMarketUI() {
-      // 1. 檢查交易時間
       const isOpen = checkHKMarketTradingHours();
       const statusBadge = document.getElementById('market-trading-status');
       if (isOpen) {
@@ -731,15 +792,12 @@
         statusBadge.className = "text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-bold";
       }
 
-      // 2. 顯示自動計算之當前雙週新聞標題與商業邏輯解釋
       const activeEvent = getCurrentBiweeklyEvent();
       document.getElementById('event-title-display').textContent = activeEvent.title;
       document.getElementById('event-explanation-box').innerHTML = activeEvent.explanation;
 
-      // 3. 取得自動新聞影響後的 10 隻股票
       const currentStocks = getAdjustedStocks();
 
-      // 4. 渲染我的持倉
       const myPortfolioList = document.getElementById('my-portfolio-list');
       myPortfolioList.innerHTML = '';
       const userStocks = currentUserData.stocks || {};
@@ -771,7 +829,6 @@
         myPortfolioList.innerHTML = '<p class="text-slate-400 text-center py-2 text-xs">目前未持有任何股票</p>';
       }
 
-      // 5. 根據下拉選單 (Pull-down Menu) 與搜尋過濾
       const selectedSector = document.getElementById('sector-filter').value;
       const searchKeyword = document.getElementById('stock-search').value.trim().toLowerCase();
 
@@ -781,7 +838,6 @@
         return matchesSector && matchesSearch;
       });
 
-      // 6. 渲染 10 隻港股列表
       const stockMarketList = document.getElementById('stock-market-list');
       stockMarketList.innerHTML = '';
 
@@ -794,7 +850,6 @@
         const isUp = stock.changePct >= 0;
         const colorClass = isUp ? "text-emerald-600" : "text-red-500";
 
-        // 行業徽章顏色
         let sectorBadgeClass = "bg-blue-100 text-blue-700";
         if (stock.sector === "公用事業") sectorBadgeClass = "bg-emerald-100 text-emerald-700";
         if (stock.sector === "地產建築") sectorBadgeClass = "bg-amber-100 text-amber-800";
@@ -825,14 +880,12 @@
       });
     }
 
-    // 監聽下拉選單與搜尋列
     document.getElementById('sector-filter').addEventListener('change', renderStockMarketUI);
     document.getElementById('stock-search').addEventListener('input', renderStockMarketUI);
 
-    // 按「手數 (Lot)」交易
     window.tradeStockByLot = async function(stockCode, action) {
       if (!checkHKMarketTradingHours()) {
-        alert("⚠️ 目前為休市時段 (非香港股票交易時間 09:30-12:00, 13:00-16:00)，無法進行買賣！");
+        alert("⚠️ 目前為休市時段，無法進行買賣！");
         return;
       }
 
@@ -900,7 +953,6 @@
       }
     };
 
-    // 清空持倉按鈕交易邏輯
     window.tradeStock = async function(stockCode, action) {
       if (!checkHKMarketTradingHours()) {
         alert("⚠️ 目前為休市時段，無法交易！");
@@ -936,7 +988,6 @@
       }
     };
 
-    // 儲存姓名
     document.getElementById('btn-save-name').addEventListener('click', async () => {
       const nameInput = document.getElementById('setup-display-name').value.trim();
       if (!nameInput) {
@@ -953,7 +1004,6 @@
       }
     });
 
-    // 載入全班總財富排行榜 (包含股票市值)
     async function loadLeaderboard() {
       const leaderboardList = document.getElementById('leaderboard-list');
       leaderboardList.innerHTML = '<p class="text-slate-400 text-center py-2">載入中...</p>';
@@ -1003,7 +1053,6 @@
       }
     }
 
-    // 載入交易紀錄
     function loadLedger(email) {
       const q = query(collection(db, 'ledger'), where('student_email', '==', email));
       unsubscribeLedger = onSnapshot(q, (snapshot) => {
@@ -1028,7 +1077,6 @@
       });
     }
 
-    // 投資中心：轉入存款 (活期 -> 投資現金)
     document.getElementById('btn-invest-deposit').addEventListener('click', async () => {
       const amount = parseInt(document.getElementById('invest-input-amount').value);
       const feedback = document.getElementById('invest-feedback');
@@ -1065,7 +1113,6 @@
       document.getElementById('invest-input-amount').value = '';
     });
 
-    // 投資中心：提領存款 (投資現金 -> 活期)
     document.getElementById('btn-invest-withdraw').addEventListener('click', async () => {
       const amount = parseInt(document.getElementById('invest-input-amount').value);
       const feedback = document.getElementById('invest-feedback');
@@ -1102,7 +1149,6 @@
       document.getElementById('invest-input-amount').value = '';
     });
 
-    // 老師手動上記薪金
     document.getElementById('btn-admin-adjust').addEventListener('click', async () => {
       const targetEmail = document.getElementById('admin-target-email').value.trim();
       const amount = parseInt(document.getElementById('admin-amount').value);
@@ -1140,7 +1186,6 @@
       }
     });
 
-    // 🗓️ 老師月底一鍵 MPF 結算與出糧
     document.getElementById('btn-admin-mpf-payroll').addEventListener('click', async () => {
       if (!confirm("確定要執行【全班月底 MPF 結算與出糧】嗎？系統將依香港 MPF 法例計算供款並入賬。")) return;
 
