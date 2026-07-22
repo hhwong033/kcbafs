@@ -13,7 +13,7 @@
     <!-- 頁頭 -->
     <header class="text-center my-4">
       <h1 class="text-2xl font-extrabold text-indigo-600">🏫 班級經濟 × DSE 企會財</h1>
-      <p class="text-xs text-slate-500">BAFS 卷一挑戰．MPF出糧結算．三戶口理財</p>
+      <p class="text-xs text-slate-500">BAFS 卷一挑戰．港股模擬交易．MPF出糧結算</p>
     </header>
 
     <!-- 1. 登入區塊 -->
@@ -101,7 +101,7 @@
       <div id="tab-leaderboard" class="tab-content space-y-4 hidden">
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
           <h3 class="font-bold text-slate-700 mb-1 flex items-center gap-1 text-base">🏆 全班財富總榜</h3>
-          <p class="text-[11px] text-slate-400 mb-3">總財富 = 活期戶口 + 投資戶口 + MPF強積金</p>
+          <p class="text-[11px] text-slate-400 mb-3">總財富 = 活期戶口 + 投資現金 + 股票市值 + MPF強積金</p>
           <div id="leaderboard-list" class="space-y-2 text-xs">
             <p class="text-slate-400 text-center py-4">載入排行榜中...</p>
           </div>
@@ -117,9 +117,9 @@
             <p class="text-[10px] text-slate-400 font-semibold">💳 活期戶口</p>
             <p class="text-base font-extrabold text-indigo-600 mt-1">$<span id="current-account-amount">0</span></p>
           </div>
-          <!-- 2. 投資戶口 -->
+          <!-- 2. 投資戶口總額 -->
           <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
-            <p class="text-[10px] text-slate-400 font-semibold">📈 投資戶口</p>
+            <p class="text-[10px] text-slate-400 font-semibold">📈 投資總資產</p>
             <p class="text-base font-extrabold text-emerald-600 mt-1">$<span id="investment-account-amount">0</span></p>
           </div>
           <!-- 3. 強積金戶口 -->
@@ -147,26 +147,75 @@
         </div>
       </div>
 
-      <!-- ================= 頁面 4：投資中心 ================= -->
+      <!-- ================= 頁面 4：模擬香港股票市場 (投資中心) ================= -->
       <div id="tab-investment" class="tab-content space-y-4 hidden">
-        <div class="bg-gradient-to-br from-emerald-500 to-teal-700 text-white p-5 rounded-2xl shadow-md text-center">
-          <p class="text-xs opacity-80">投資戶口總額</p>
-          <h2 class="text-3xl font-extrabold mt-1">$ <span id="invest-page-balance">0</span></h2>
-          <p class="text-[10px] opacity-70 mt-1">資金源自「活期戶口」轉入</p>
+        
+        <!-- 恒生指數 (HSI) 報價卡片 -->
+        <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md border border-slate-800">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
+            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">🇭🇰 恒生指數 Hang Seng Index</span>
+            <span id="hsi-status" class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-bold">交易中</span>
+          </div>
+          <div class="flex justify-between items-baseline">
+            <div>
+              <h2 id="hsi-points" class="text-2xl font-extrabold text-emerald-400">18,320.50</h2>
+              <p id="hsi-change" class="text-xs font-semibold text-emerald-400">+185.30 (+1.02%)</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] text-slate-400">大盤氣氛</p>
+              <span id="hsi-sentiment" class="text-xs font-bold text-emerald-300">偏向樂觀 ↗</span>
+            </div>
+          </div>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-          <h3 class="font-bold text-emerald-700 text-sm">📈 活期薪金轉投資</h3>
-          <p class="text-xs text-slate-500">你可以將「活期戶口」的資金轉入投資戶口賺取收益，也可隨時提領回活期戶口。</p>
-          
-          <input type="number" id="invest-input-amount" placeholder="輸入金額" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none">
-          
-          <div class="grid grid-cols-2 gap-2">
-            <button id="btn-invest-deposit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition">轉入投資 (+)</button>
-            <button id="btn-invest-withdraw" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 rounded-lg text-xs transition">提領至活期 (-)</button>
+        <!-- 資產總覽卡片 (投資現金 + 股票市值) -->
+        <div class="bg-gradient-to-br from-emerald-600 to-teal-800 text-white p-4 rounded-2xl shadow-md space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs opacity-80">投資總資產</span>
+            <span class="text-xs font-bold bg-white/20 px-2 py-0.5 rounded">$<span id="invest-total-asset">0</span></span>
           </div>
-          <p id="invest-feedback" class="text-xs mt-1 hidden"></p>
+          <div class="grid grid-cols-2 gap-2 text-center pt-1 border-t border-white/20">
+            <div>
+              <p class="text-[10px] opacity-70">💵 投資可用現金</p>
+              <p class="text-base font-extrabold">$<span id="invest-cash-balance">0</span></p>
+            </div>
+            <div>
+              <p class="text-[10px] opacity-70">📊 持有股票市值</p>
+              <p class="text-base font-extrabold text-amber-300">$<span id="invest-stock-value">0</span></p>
+            </div>
+          </div>
         </div>
+
+        <!-- 活期 ⇄ 投資現金 資金調撥 -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-2">
+          <h3 class="font-bold text-slate-700 text-xs">💳 活期戶口與投資現金調撥</h3>
+          <div class="flex gap-2">
+            <input type="number" id="invest-input-amount" placeholder="金額" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs outline-none">
+            <button id="btn-invest-deposit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap">轉入投資</button>
+            <button id="btn-invest-withdraw" class="bg-slate-600 hover:bg-slate-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition whitespace-nowrap">提領活期</button>
+          </div>
+          <p id="invest-feedback" class="text-[11px] hidden"></p>
+        </div>
+
+        <!-- 我的股票持倉列表 -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-2">
+          <h3 class="font-bold text-slate-700 text-xs flex items-center justify-between">
+            <span>💼 我的股票持倉</span>
+            <span class="text-[10px] text-slate-400 font-normal">單位：股</span>
+          </h3>
+          <div id="my-portfolio-list" class="space-y-2 text-xs">
+            <p class="text-slate-400 text-center py-2">目前未持有任何股票</p>
+          </div>
+        </div>
+
+        <!-- 模擬港股大盤市場列表 -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+          <h3 class="font-bold text-slate-700 text-xs">🏬 香港模擬股票市場 (即時報價)</h3>
+          <div id="stock-market-list" class="space-y-2">
+            <!-- 由 JS 動態生成股票列表 -->
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -188,7 +237,7 @@
     </button>
     <button onclick="switchTab('tab-investment', this)" class="nav-btn flex flex-col items-center text-slate-400 text-[11px]">
       <span class="text-base">📈</span>
-      <span>投資中心</span>
+      <span>投資港股</span>
     </button>
   </nav>
 
@@ -207,7 +256,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, collection, addDoc, onSnapshot, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, collection, addDoc, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // 🔴 請將下方的 Firebase 金鑰替換為你的專屬資料 🔴
     const firebaseConfig = {
@@ -238,7 +287,6 @@
     const investmentAccountAmount = document.getElementById('investment-account-amount');
     const mpfAccountAmount = document.getElementById('mpf-account-amount');
     const walletAccruedAmount = document.getElementById('wallet-accrued-amount');
-    const investPageBalance = document.getElementById('invest-page-balance');
 
     const btnLogout = document.getElementById('btn-logout');
     const ledgerList = document.getElementById('ledger-list');
@@ -247,6 +295,24 @@
     let currentUserData = {};
     let unsubscribeUserDoc = null;
     let unsubscribeLedger = null;
+
+    // 🇭🇰 模擬香港股票市場數據庫
+    const hkStocks = [
+      { code: "2800", name: "盈富基金 (Tracker Fund)", price: 18.50, change: +0.85 },
+      { code: "0700", name: "騰訊控股 (Tencent)", price: 380.00, change: +1.52 },
+      { code: "9988", name: "阿里巴巴 (Alibaba)", price: 78.50, change: -0.63 },
+      { code: "0005", name: "匯豐控股 (HSBC)", price: 68.20, change: +0.44 },
+      { code: "1299", name: "友邦保險 (AIA)", price: 58.00, change: -1.15 }
+    ];
+
+    // 計算恒生指數擬真點數
+    function getHSI() {
+      return {
+        points: "18,320.50",
+        changeStr: "+185.30 (+1.02%)",
+        isPositive: true
+      };
+    }
 
     // 📚 香港 DSE 企會財（BAFS）卷一題庫
     const bafsQuestions = [
@@ -348,7 +414,7 @@
       });
     }
 
-    // 檢查 BAFS 答案與發放獎金
+    // 檢查 BAFS 答案
     async function checkBAFSAnswer(selectedKey) {
       if (isAnsweredCurrent) return;
       isAnsweredCurrent = true;
@@ -361,7 +427,6 @@
         feedback.className = "text-xs mt-2 p-2.5 rounded-lg bg-green-50 border border-green-200 text-green-700 font-bold";
         feedback.innerHTML = `🎉 答對了！(答案：${q.answer})<br><span class="font-normal text-[11px] text-green-600">${q.explanation}</span><br><strong>+$${q.reward} 已記入本月待出糧金額！</strong>`;
         
-        // 注入待出糧金額
         const userRef = doc(db, 'users', currentUser.uid);
         await updateDoc(userRef, { accrued_salary: increment(q.reward) });
         await addDoc(collection(db, 'ledger'), {
@@ -384,7 +449,7 @@
       renderBAFSQuestion();
     });
 
-    // 切換分頁函式
+    // 切換分頁
     window.switchTab = function(tabId, btnElement) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
       document.getElementById(tabId).classList.remove('hidden');
@@ -398,6 +463,7 @@
 
       if (tabId === 'tab-leaderboard') loadLeaderboard();
       if (tabId === 'tab-questions') renderBAFSQuestion();
+      if (tabId === 'tab-investment') renderStockMarketUI();
     }
 
     // 登入
@@ -436,7 +502,20 @@
       }
     });
 
-    // 即時監聽個人資料與三大戶口
+    // 計算使用者股票總市值
+    function calculateStockPortfolioValue(userStocksObj) {
+      if (!userStocksObj) return 0;
+      let totalValue = 0;
+      for (const [code, qty] of Object.entries(userStocksObj)) {
+        const stock = hkStocks.find(s => s.code === code);
+        if (stock && qty > 0) {
+          totalValue += stock.price * qty;
+        }
+      }
+      return Math.round(totalValue);
+    }
+
+    // 即時監聽個人資料與戶口
     async function setupUserRealtime(user) {
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
@@ -445,9 +524,10 @@
         await setDoc(userRef, {
           email: user.email,
           display_name: "",
-          accrued_salary: 0,        // 本月待出糧薪金
+          accrued_salary: 0,        // 本月待出糧
           current_account: 0,       // 活期戶口
-          investment_account: 0,    // 投資戶口
+          investment_cash: 0,       // 投資戶口現金
+          stocks: {},               // 持有股票手數/股數 Map
           mpf_account: 0,           // 強積金戶口
           is_admin: false
         });
@@ -459,15 +539,22 @@
 
           const accrued = currentUserData.accrued_salary || 0;
           const current = currentUserData.current_account || currentUserData.current_salary || 0;
-          const invest = currentUserData.investment_account || currentUserData.investment_balance || 0;
+          const investCash = currentUserData.investment_cash || currentUserData.investment_account || 0;
+          const userStocks = currentUserData.stocks || {};
+          const stockValue = calculateStockPortfolioValue(userStocks);
+          const totalInvest = investCash + stockValue;
           const mpf = currentUserData.mpf_account || 0;
 
           accruedSalaryAmount.textContent = accrued;
           walletAccruedAmount.textContent = accrued;
           currentAccountAmount.textContent = current;
-          investmentAccountAmount.textContent = invest;
-          investPageBalance.textContent = invest;
+          investmentAccountAmount.textContent = totalInvest;
           mpfAccountAmount.textContent = mpf;
+
+          // 更新投資中心 UI 數據
+          document.getElementById('invest-cash-balance').textContent = investCash;
+          document.getElementById('invest-stock-value').textContent = stockValue;
+          document.getElementById('invest-total-asset').textContent = totalInvest;
 
           // 首次登入姓名檢查
           if (!currentUserData.display_name || currentUserData.display_name.trim() === "") {
@@ -487,9 +574,148 @@
             userRoleBadge.className = "text-[10px] inline-block bg-slate-100 text-slate-600 px-2 py-0.5 rounded";
             document.getElementById('admin-panel').classList.add('hidden');
           }
+
+          // 如果目前在投資頁面，同步刷新持倉
+          if (!document.getElementById('tab-investment').classList.contains('hidden')) {
+            renderStockMarketUI();
+          }
         }
       });
     }
+
+    // 渲染股票市場與持倉列表 UI
+    function renderStockMarketUI() {
+      // 1. 恒指大盤
+      const hsi = getHSI();
+      document.getElementById('hsi-points').textContent = hsi.points;
+      document.getElementById('hsi-change').textContent = hsi.changeStr;
+
+      // 2. 渲染我的持倉
+      const myPortfolioList = document.getElementById('my-portfolio-list');
+      myPortfolioList.innerHTML = '';
+      const userStocks = currentUserData.stocks || {};
+      let hasHolding = false;
+
+      for (const [code, qty] of Object.entries(userStocks)) {
+        if (qty > 0) {
+          hasHolding = true;
+          const stock = hkStocks.find(s => s.code === code);
+          const totalVal = Math.round(stock.price * qty);
+
+          const div = document.createElement('div');
+          div.className = "flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl";
+          div.innerHTML = `
+            <div>
+              <p class="font-bold text-slate-800">${stock.name} (${code})</p>
+              <p class="text-[10px] text-slate-500">持有: ${qty} 股 | 現價: $${stock.price}</p>
+            </div>
+            <div class="text-right">
+              <p class="font-extrabold text-emerald-600">$${totalVal}</p>
+              <button onclick="tradeStock('${code}', 'SELL')" class="text-[10px] bg-red-100 text-red-600 hover:bg-red-200 font-bold px-2 py-0.5 rounded mt-0.5">賣出股票</button>
+            </div>
+          `;
+          myPortfolioList.appendChild(div);
+        }
+      }
+
+      if (!hasHolding) {
+        myPortfolioList.innerHTML = '<p class="text-slate-400 text-center py-2 text-xs">目前未持有任何股票</p>';
+      }
+
+      // 3. 渲染港股大盤列表
+      const stockMarketList = document.getElementById('stock-market-list');
+      stockMarketList.innerHTML = '';
+
+      hkStocks.forEach(stock => {
+        const isUp = stock.change >= 0;
+        const colorClass = isUp ? "text-emerald-600" : "text-red-500";
+
+        const div = document.createElement('div');
+        div.className = "p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2";
+        div.innerHTML = `
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-[10px] font-bold bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded mr-1">${stock.code}</span>
+              <span class="font-bold text-xs text-slate-800">${stock.name}</span>
+            </div>
+            <div class="text-right">
+              <span class="font-extrabold text-sm text-slate-800">$${stock.price}</span>
+              <span class="text-[11px] font-bold ${colorClass} block">${isUp ? '+' : ''}${stock.change}%</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 pt-1 border-t border-slate-200">
+            <input type="number" id="trade-qty-${stock.code}" placeholder="輸入股數" min="1" value="10" class="w-1/2 px-2 py-1 text-xs border border-slate-300 rounded outline-none bg-white">
+            <button onclick="tradeStock('${stock.code}', 'BUY')" class="w-1/4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1 rounded text-xs transition">買入</button>
+            <button onclick="tradeStock('${stock.code}', 'SELL')" class="w-1/4 bg-red-500 hover:bg-red-600 text-white font-bold py-1 rounded text-xs transition">賣出</button>
+          </div>
+        `;
+        stockMarketList.appendChild(div);
+      });
+    }
+
+    // 全局股票買賣交易邏輯
+    window.tradeStock = async function(stockCode, action) {
+      const stock = hkStocks.find(s => s.code === stockCode);
+      const qtyInput = document.getElementById(`trade-qty-${stockCode}`);
+      const qty = parseInt(qtyInput ? qtyInput.value : 10);
+
+      if (isNaN(qty) || qty <= 0) {
+        alert("請輸入有效的交易股數！");
+        return;
+      }
+
+      const totalCost = Math.round(stock.price * qty);
+      const userCash = currentUserData.investment_cash || 0;
+      let userStocks = currentUserData.stocks || {};
+      const currentShares = userStocks[stockCode] || 0;
+
+      const userRef = doc(db, 'users', currentUser.uid);
+
+      if (action === 'BUY') {
+        if (userCash < totalCost) {
+          alert(`投資可用現金不足！購買 ${qty} 股 ${stock.name} 需要 $${totalCost}。`);
+          return;
+        }
+
+        userStocks[stockCode] = currentShares + qty;
+
+        await updateDoc(userRef, {
+          investment_cash: increment(-totalCost),
+          stocks: userStocks
+        });
+
+        await addDoc(collection(db, 'ledger'), {
+          student_email: currentUser.email,
+          amount: -totalCost,
+          reason: `[買入港股] ${stock.name} (${stockCode}) x ${qty} 股`,
+          created_at: new Date()
+        });
+
+        alert(`🎉 成功買入 ${qty} 股 ${stock.name}，扣除現金 $${totalCost}！`);
+
+      } else if (action === 'SELL') {
+        if (currentShares < qty) {
+          alert(`持有股票數量不足！你目前只持有 ${currentShares} 股 ${stock.name}。`);
+          return;
+        }
+
+        userStocks[stockCode] = currentShares - qty;
+
+        await updateDoc(userRef, {
+          investment_cash: increment(totalCost),
+          stocks: userStocks
+        });
+
+        await addDoc(collection(db, 'ledger'), {
+          student_email: currentUser.email,
+          amount: totalCost,
+          reason: `[賣出港股] ${stock.name} (${stockCode}) x ${qty} 股`,
+          created_at: new Date()
+        });
+
+        alert(`💰 成功賣出 ${qty} 股 ${stock.name}，獲得現金 $${totalCost}！`);
+      }
+    };
 
     // 儲存姓名
     document.getElementById('btn-save-name').addEventListener('click', async () => {
@@ -508,7 +734,7 @@
       }
     });
 
-    // 載入全班總財富排行榜
+    // 載入全班總財富排行榜 (包含股票市值)
     async function loadLeaderboard() {
       const leaderboardList = document.getElementById('leaderboard-list');
       leaderboardList.innerHTML = '<p class="text-slate-400 text-center py-2">載入中...</p>';
@@ -520,9 +746,10 @@
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
           const current = data.current_account || data.current_salary || 0;
-          const invest = data.investment_account || data.investment_balance || 0;
+          const investCash = data.investment_cash || data.investment_account || 0;
+          const stockVal = calculateStockPortfolioValue(data.stocks || {});
           const mpf = data.mpf_account || 0;
-          const totalWealth = current + invest + mpf;
+          const totalWealth = current + investCash + stockVal + mpf;
 
           studentList.push({
             displayName: data.display_name || data.email.split('@')[0],
@@ -582,7 +809,7 @@
       });
     }
 
-    // 投資中心：轉入存款 (活期 -> 投資)
+    // 投資中心：轉入存款 (活期 -> 投資現金)
     document.getElementById('btn-invest-deposit').addEventListener('click', async () => {
       const amount = parseInt(document.getElementById('invest-input-amount').value);
       const feedback = document.getElementById('invest-feedback');
@@ -591,13 +818,13 @@
       const currentBalance = currentUserData.current_account || currentUserData.current_salary || 0;
 
       if (isNaN(amount) || amount <= 0) {
-        feedback.className = "text-xs text-red-500";
+        feedback.className = "text-[11px] text-red-500";
         feedback.textContent = "請輸入有效的轉入金額！";
         return;
       }
 
       if (currentBalance < amount) {
-        feedback.className = "text-xs text-red-500";
+        feedback.className = "text-[11px] text-red-500";
         feedback.textContent = "活期戶口餘額不足！";
         return;
       }
@@ -605,53 +832,53 @@
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
         current_account: increment(-amount),
-        investment_account: increment(amount)
+        investment_cash: increment(amount)
       });
       await addDoc(collection(db, 'ledger'), {
         student_email: currentUser.email,
         amount: -amount,
-        reason: "活期轉入投資戶口",
+        reason: "活期轉入投資現金",
         created_at: new Date()
       });
 
-      feedback.className = "text-xs text-green-600 font-bold";
-      feedback.textContent = `成功轉入 $${amount} 至投資戶口！`;
+      feedback.className = "text-[11px] text-green-600 font-bold";
+      feedback.textContent = `成功轉入 $${amount} 至投資現金！`;
       document.getElementById('invest-input-amount').value = '';
     });
 
-    // 投資中心：提領存款 (投資 -> 活期)
+    // 投資中心：提領存款 (投資現金 -> 活期)
     document.getElementById('btn-invest-withdraw').addEventListener('click', async () => {
       const amount = parseInt(document.getElementById('invest-input-amount').value);
       const feedback = document.getElementById('invest-feedback');
       feedback.classList.remove('hidden');
 
-      const investBalance = currentUserData.investment_account || currentUserData.investment_balance || 0;
+      const investCash = currentUserData.investment_cash || 0;
 
       if (isNaN(amount) || amount <= 0) {
-        feedback.className = "text-xs text-red-500";
+        feedback.className = "text-[11px] text-red-500";
         feedback.textContent = "請輸入有效的提領金額！";
         return;
       }
 
-      if (investBalance < amount) {
-        feedback.className = "text-xs text-red-500";
-        feedback.textContent = "投資戶口餘額不足！";
+      if (investCash < amount) {
+        feedback.className = "text-[11px] text-red-500";
+        feedback.textContent = "投資現金餘額不足！(股票市值需先賣出才能提領)";
         return;
       }
 
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
         current_account: increment(amount),
-        investment_account: increment(-amount)
+        investment_cash: increment(-amount)
       });
       await addDoc(collection(db, 'ledger'), {
         student_email: currentUser.email,
         amount: amount,
-        reason: "投資戶口提領至活期",
+        reason: "投資現金提領至活期",
         created_at: new Date()
       });
 
-      feedback.className = "text-xs text-green-600 font-bold";
+      feedback.className = "text-[11px] text-green-600 font-bold";
       feedback.textContent = `成功提領 $${amount} 回活期戶口！`;
       document.getElementById('invest-input-amount').value = '';
     });
