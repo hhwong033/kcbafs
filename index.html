@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>班級經濟與 DSE BAFS 企會財系統</title>
+  <title>班級經濟與 DSE BAFS 企會財系統 - 港股模擬交易</title>
   <!-- 引入 Tailwind CSS 美化介面 -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -208,11 +208,26 @@
           </div>
         </div>
 
-        <!-- 模擬港股大盤市場列表 -->
+        <!-- 🏬 模擬港股大盤市場列表與 Pull-down Menu 篩選列 -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-          <h3 class="font-bold text-slate-700 text-xs">🏬 香港模擬股票市場 (即時報價)</h3>
+          <div class="flex flex-col gap-2">
+            <h3 class="font-bold text-slate-700 text-xs">🏬 香港模擬股票市場 (即時報價)</h3>
+            
+            <!-- 下拉式選單 (Pull-down Menu) & 搜尋框 -->
+            <div class="grid grid-cols-2 gap-2">
+              <select id="sector-filter" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-slate-50 font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="ALL">全部行業 (All Sectors)</option>
+                <option value="金融業">金融業 (Financials)</option>
+                <option value="公用事業">公用事業 (Utilities)</option>
+                <option value="地產建築">地產建築 (Properties)</option>
+                <option value="工商業">工商業 (Commerce)</option>
+              </select>
+              <input type="text" id="stock-search" placeholder="搜尋名稱或代號..." class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+
           <div id="stock-market-list" class="space-y-2">
-            <!-- 由 JS 動態生成股票列表 -->
+            <!-- 由 JS 動態生成 10 隻股票列表 -->
           </div>
         </div>
 
@@ -296,13 +311,22 @@
     let unsubscribeUserDoc = null;
     let unsubscribeLedger = null;
 
-    // 🇭🇰 模擬香港股票市場數據庫
+    // 🇭🇰 10 隻真實港股數據庫 (涵蓋四大行業，金額真實)
     const hkStocks = [
-      { code: "2800", name: "盈富基金 (Tracker Fund)", price: 18.50, change: +0.85 },
-      { code: "0700", name: "騰訊控股 (Tencent)", price: 380.00, change: +1.52 },
-      { code: "9988", name: "阿里巴巴 (Alibaba)", price: 78.50, change: -0.63 },
-      { code: "0005", name: "匯豐控股 (HSBC)", price: 68.20, change: +0.44 },
-      { code: "1299", name: "友邦保險 (AIA)", price: 58.00, change: -1.15 }
+      // 金融業
+      { code: "0005", name: "匯豐控股 (HSBC)", sector: "金融業", price: 158.30, change: +1.08, lotSize: 400 },
+      { code: "1299", name: "友邦保險 (AIA)", sector: "金融業", price: 77.10, change: +0.19, lotSize: 200 },
+      { code: "0939", name: "建設銀行 (CCB)", sector: "金融業", price: 6.50, change: -0.31, lotSize: 1000 },
+      // 公用事業
+      { code: "0002", name: "中華電力 (CLP)", sector: "公用事業", price: 77.40, change: +0.85, lotSize: 500 },
+      { code: "0003", name: "中華煤氣 (Towngas)", sector: "公用事業", price: 6.91, change: -0.43, lotSize: 1000 },
+      // 地產建築
+      { code: "0016", name: "新鴻基地產 (SHKP)", sector: "地產建築", price: 122.60, change: -0.57, lotSize: 500 },
+      { code: "1113", name: "長實集團 (CK Asset)", sector: "地產建築", price: 47.70, change: -0.25, lotSize: 500 },
+      // 工商業
+      { code: "0700", name: "騰訊控股 (Tencent)", sector: "工商業", price: 441.40, change: -6.75, lotSize: 100 },
+      { code: "9988", name: "阿里巴巴 (Alibaba)", sector: "工商業", price: 113.80, change: -3.25, lotSize: 100 },
+      { code: "3690", name: "美團 (Meituan)", sector: "工商業", price: 83.15, change: -2.41, lotSize: 100 }
     ];
 
     // 計算恒生指數擬真點數
@@ -611,7 +635,7 @@
             </div>
             <div class="text-right">
               <p class="font-extrabold text-emerald-600">$${totalVal}</p>
-              <button onclick="tradeStock('${code}', 'SELL')" class="text-[10px] bg-red-100 text-red-600 hover:bg-red-200 font-bold px-2 py-0.5 rounded mt-0.5">賣出股票</button>
+              <button onclick="tradeStock('${code}', 'SELL')" class="text-[10px] bg-red-100 text-red-600 hover:bg-red-200 font-bold px-2 py-0.5 rounded mt-0.5">賣出全部</button>
             </div>
           `;
           myPortfolioList.appendChild(div);
@@ -622,13 +646,34 @@
         myPortfolioList.innerHTML = '<p class="text-slate-400 text-center py-2 text-xs">目前未持有任何股票</p>';
       }
 
-      // 3. 渲染港股大盤列表
+      // 3. 根據下拉選單 (Pull-down Menu) 與搜尋關鍵字過濾股票列表
+      const selectedSector = document.getElementById('sector-filter').value;
+      const searchKeyword = document.getElementById('stock-search').value.trim().toLowerCase();
+
+      const filteredStocks = hkStocks.filter(stock => {
+        const matchesSector = (selectedSector === "ALL") || (stock.sector === selectedSector);
+        const matchesSearch = stock.name.toLowerCase().includes(searchKeyword) || stock.code.includes(searchKeyword);
+        return matchesSector && matchesSearch;
+      });
+
+      // 4. 渲染 10 隻港股大盤列表
       const stockMarketList = document.getElementById('stock-market-list');
       stockMarketList.innerHTML = '';
 
-      hkStocks.forEach(stock => {
+      if (filteredStocks.length === 0) {
+        stockMarketList.innerHTML = '<p class="text-slate-400 text-center py-3 text-xs">搜尋不到符合條件的股票</p>';
+        return;
+      }
+
+      filteredStocks.forEach(stock => {
         const isUp = stock.change >= 0;
         const colorClass = isUp ? "text-emerald-600" : "text-red-500";
+
+        // 行業徽章顏色
+        let sectorBadgeClass = "bg-blue-100 text-blue-700";
+        if (stock.sector === "公用事業") sectorBadgeClass = "bg-emerald-100 text-emerald-700";
+        if (stock.sector === "地產建築") sectorBadgeClass = "bg-amber-100 text-amber-800";
+        if (stock.sector === "工商業") sectorBadgeClass = "bg-purple-100 text-purple-700";
 
         const div = document.createElement('div');
         div.className = "p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2";
@@ -636,35 +681,42 @@
           <div class="flex justify-between items-center">
             <div>
               <span class="text-[10px] font-bold bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded mr-1">${stock.code}</span>
-              <span class="font-bold text-xs text-slate-800">${stock.name}</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 ${sectorBadgeClass}">${stock.sector}</span>
+              <span class="font-bold text-xs text-slate-800 block sm:inline mt-0.5">${stock.name}</span>
             </div>
             <div class="text-right">
-              <span class="font-extrabold text-sm text-slate-800">$${stock.price}</span>
+              <span class="font-extrabold text-sm text-slate-800">$${stock.price.toFixed(2)}</span>
               <span class="text-[11px] font-bold ${colorClass} block">${isUp ? '+' : ''}${stock.change}%</span>
             </div>
           </div>
+          <p class="text-[10px] text-slate-400">每手規格：${stock.lotSize} 股</p>
           <div class="flex items-center gap-2 pt-1 border-t border-slate-200">
-            <input type="number" id="trade-qty-${stock.code}" placeholder="輸入股數" min="1" value="10" class="w-1/2 px-2 py-1 text-xs border border-slate-300 rounded outline-none bg-white">
-            <button onclick="tradeStock('${stock.code}', 'BUY')" class="w-1/4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1 rounded text-xs transition">買入</button>
-            <button onclick="tradeStock('${stock.code}', 'SELL')" class="w-1/4 bg-red-500 hover:bg-red-600 text-white font-bold py-1 rounded text-xs transition">賣出</button>
+            <input type="number" id="trade-lots-${stock.code}" placeholder="輸入手數" min="1" value="1" class="w-1/2 px-2 py-1 text-xs border border-slate-300 rounded outline-none bg-white">
+            <button onclick="tradeStockByLot('${stock.code}', 'BUY')" class="w-1/4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1 rounded text-xs transition">買入</button>
+            <button onclick="tradeStockByLot('${stock.code}', 'SELL')" class="w-1/4 bg-red-500 hover:bg-red-600 text-white font-bold py-1 rounded text-xs transition">賣出</button>
           </div>
         `;
         stockMarketList.appendChild(div);
       });
     }
 
-    // 全局股票買賣交易邏輯
-    window.tradeStock = async function(stockCode, action) {
-      const stock = hkStocks.find(s => s.code === stockCode);
-      const qtyInput = document.getElementById(`trade-qty-${stockCode}`);
-      const qty = parseInt(qtyInput ? qtyInput.value : 10);
+    // 監聽下拉選單與搜尋列變更，即時過濾股票列表
+    document.getElementById('sector-filter').addEventListener('change', renderStockMarketUI);
+    document.getElementById('stock-search').addEventListener('input', renderStockMarketUI);
 
-      if (isNaN(qty) || qty <= 0) {
-        alert("請輸入有效的交易股數！");
+    // 按「手數 (Lot)」進行交易
+    window.tradeStockByLot = async function(stockCode, action) {
+      const stock = hkStocks.find(s => s.code === stockCode);
+      const lotsInput = document.getElementById(`trade-lots-${stockCode}`);
+      const lots = parseInt(lotsInput ? lotsInput.value : 1);
+
+      if (isNaN(lots) || lots <= 0) {
+        alert("請輸入有效的交易手數！");
         return;
       }
 
-      const totalCost = Math.round(stock.price * qty);
+      const sharesToTrade = lots * stock.lotSize;
+      const totalCost = Math.round(stock.price * sharesToTrade);
       const userCash = currentUserData.investment_cash || 0;
       let userStocks = currentUserData.stocks || {};
       const currentShares = userStocks[stockCode] || 0;
@@ -673,11 +725,11 @@
 
       if (action === 'BUY') {
         if (userCash < totalCost) {
-          alert(`投資可用現金不足！購買 ${qty} 股 ${stock.name} 需要 $${totalCost}。`);
+          alert(`投資可用現金不足！購買 ${lots} 手 (${sharesToTrade} 股) ${stock.name} 需要 $${totalCost}。`);
           return;
         }
 
-        userStocks[stockCode] = currentShares + qty;
+        userStocks[stockCode] = currentShares + sharesToTrade;
 
         await updateDoc(userRef, {
           investment_cash: increment(-totalCost),
@@ -687,19 +739,19 @@
         await addDoc(collection(db, 'ledger'), {
           student_email: currentUser.email,
           amount: -totalCost,
-          reason: `[買入港股] ${stock.name} (${stockCode}) x ${qty} 股`,
+          reason: `[買入港股] ${stock.name} (${stockCode}) x ${lots}手 (${sharesToTrade}股)`,
           created_at: new Date()
         });
 
-        alert(`🎉 成功買入 ${qty} 股 ${stock.name}，扣除現金 $${totalCost}！`);
+        alert(`🎉 成功買入 ${lots} 手 (${sharesToTrade} 股) ${stock.name}，扣除現金 $${totalCost}！`);
 
       } else if (action === 'SELL') {
-        if (currentShares < qty) {
-          alert(`持有股票數量不足！你目前只持有 ${currentShares} 股 ${stock.name}。`);
+        if (currentShares < sharesToTrade) {
+          alert(`持有股票數量不足！你目前持有 ${currentShares} 股 ${stock.name}，不足 ${sharesToTrade} 股。`);
           return;
         }
 
-        userStocks[stockCode] = currentShares - qty;
+        userStocks[stockCode] = currentShares - sharesToTrade;
 
         await updateDoc(userRef, {
           investment_cash: increment(totalCost),
@@ -709,11 +761,41 @@
         await addDoc(collection(db, 'ledger'), {
           student_email: currentUser.email,
           amount: totalCost,
-          reason: `[賣出港股] ${stock.name} (${stockCode}) x ${qty} 股`,
+          reason: `[賣出港股] ${stock.name} (${stockCode}) x ${lots}手 (${sharesToTrade}股)`,
           created_at: new Date()
         });
 
-        alert(`💰 成功賣出 ${qty} 股 ${stock.name}，獲得現金 $${totalCost}！`);
+        alert(`💰 成功賣出 ${lots} 手 (${sharesToTrade} 股) ${stock.name}，獲得現金 $${totalCost}！`);
+      }
+    };
+
+    // 清空持倉按鈕交易邏輯 (賣出全部)
+    window.tradeStock = async function(stockCode, action) {
+      if (action === 'SELL') {
+        const stock = hkStocks.find(s => s.code === stockCode);
+        let userStocks = currentUserData.stocks || {};
+        const currentShares = userStocks[stockCode] || 0;
+
+        if (currentShares <= 0) return;
+
+        const totalCost = Math.round(stock.price * currentShares);
+        userStocks[stockCode] = 0;
+
+        const userRef = doc(db, 'users', currentUser.uid);
+
+        await updateDoc(userRef, {
+          investment_cash: increment(totalCost),
+          stocks: userStocks
+        });
+
+        await addDoc(collection(db, 'ledger'), {
+          student_email: currentUser.email,
+          amount: totalCost,
+          reason: `[清空持倉賣出] ${stock.name} (${stockCode}) x ${currentShares} 股`,
+          created_at: new Date()
+        });
+
+        alert(`💰 已成功賣出全部 ${currentShares} 股 ${stock.name}，回收現金 $${totalCost}！`);
       }
     };
 
