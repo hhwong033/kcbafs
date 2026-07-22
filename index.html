@@ -84,6 +84,7 @@
             <span class="text-xs text-amber-600 font-bold">獎酬：+$1,000 (待出糧)</span>
           </div>
 
+          <!-- 不顯示題號，直接顯示問題 -->
           <p id="question-text" class="text-sm font-semibold text-slate-800 leading-relaxed">載入題目中...</p>
 
           <!-- 4 個動態洗牌選項按鈕 (A, B, C, D) -->
@@ -430,7 +431,6 @@
     }
 
     // ================= 📚 香港 DSE 企會財（BAFS）卷一大題庫結構 =================
-    // 選項改為 { text: "...", isCorrect: boolean } 格式，方便隨機洗牌！
     const bafsQuestions = [
       {
         id: 1,
@@ -562,7 +562,6 @@
         reward: 1000,
         explanation: "應收賬款預計會在一年（或一個營業週期）內變現，故屬於流動資產。"
       }
-      // 💡 老師可在此處持續新增至 100+ 題！
     ];
 
     let currentQuestionIndex = 0;
@@ -579,11 +578,13 @@
       return arr;
     }
 
-    // 渲染 BAFS 題目（選項動態洗牌）
+    // 渲染 BAFS 題目（不標示題號，選項動態洗牌）
     function renderBAFSQuestion() {
       const q = bafsQuestions[currentQuestionIndex];
       document.getElementById('question-category').textContent = q.category;
-      document.getElementById('question-text').textContent = `[第 ${currentQuestionIndex + 1} 題] ${q.question}`;
+      
+      // 💡 此處已移除題號標示，直接顯示題目內容
+      document.getElementById('question-text').textContent = q.question;
 
       const optionsContainer = document.getElementById('options-container');
       optionsContainer.innerHTML = '';
@@ -607,7 +608,7 @@
       });
     }
 
-    // 檢查 BAFS 答案（根據動態洗牌後的索引）
+    // 檢查 BAFS 答案
     async function checkBAFSAnswer(shuffledIndex, clickedKey) {
       if (isAnsweredCurrent) return;
       isAnsweredCurrent = true;
@@ -617,7 +618,6 @@
       const feedback = document.getElementById('answer-feedback');
       feedback.classList.remove('hidden');
 
-      // 尋找正確答案文字
       const correctOption = q.options.find(o => o.isCorrect);
 
       if (selectedOption.isCorrect) {
@@ -640,9 +640,8 @@
       document.getElementById('btn-next-question').classList.remove('hidden');
     }
 
-    // 下一題按鈕（隨機抽題或循環，且重新觸發洗牌）
+    // 下一題按鈕（隨機抽題）
     document.getElementById('btn-next-question').addEventListener('click', () => {
-      // 隨機抽選下一題，讓重複挑戰更具趣味性
       let nextIndex = Math.floor(Math.random() * bafsQuestions.length);
       if (nextIndex === currentQuestionIndex) {
         nextIndex = (currentQuestionIndex + 1) % bafsQuestions.length;
