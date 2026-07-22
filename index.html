@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>班級經濟系統 - Classroom Economy</title>
-  <!-- 引入 Tailwind CSS CDN -->
+  <title>班級經濟管理系統 - Single Page Application</title>
+  <!-- 引入 Tailwind CSS (美化介面) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- 引入 FontAwesome 圖示庫 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,8 +15,8 @@
   <nav class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-3">
-        <i class="fa-solid me-2 fa-coins text-yellow-300 text-2xl"></i>
-        <span class="font-bold text-xl tracking-wide">班級經濟系統</span>
+        <i class="fa-solid fa-coins text-yellow-300 text-2xl"></i>
+        <span class="font-bold text-xl tracking-wide">班級經濟管理系統</span>
       </div>
       <!-- 使用者資訊與登出按鈕 -->
       <div id="userInfoHeader" class="hidden flex items-center space-x-4">
@@ -35,14 +35,14 @@
       <h2 id="authTitle" class="text-2xl font-bold text-center text-slate-800 mb-6">帳號登入</h2>
       
       <form id="authForm" class="space-y-4">
-        <!-- 姓名欄位（僅註冊時使用） -->
+        <!-- 姓名欄位（僅註冊模式時顯示） -->
         <div id="nameGroup" class="hidden">
-          <label class="block text-sm font-medium text-slate-700 mb-1">真實姓名 / 稱呼</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">真實姓名</label>
           <input type="text" id="authName" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="例如：張小明">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">電子郵件</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">電子郵件 (Email)</label>
           <input type="email" id="authEmail" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="student@school.com">
         </div>
 
@@ -51,7 +51,7 @@
           <input type="password" id="authPassword" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="••••••••">
         </div>
 
-        <!-- 身分選擇（僅註冊時使用） -->
+        <!-- 身分選擇（僅註冊模式時顯示） -->
         <div id="roleGroup" class="hidden">
           <label class="block text-sm font-medium text-slate-700 mb-1">註冊身分</label>
           <select id="authRole" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
@@ -70,33 +70,32 @@
         <button id="toggleAuthMode" class="text-indigo-600 font-semibold hover:underline ml-1">前往註冊</button>
       </div>
 
-      <!-- 錯誤或訊息提示 -->
+      <!-- 訊息提示視窗 -->
       <div id="authMsg" class="mt-4 p-3 rounded-lg text-sm hidden"></div>
     </section>
 
-    <!-- 2. 學生儀表板 (登入後若為學生則顯示) -->
+    <!-- 2. 學生儀表板 (登入後一般學生顯示) -->
     <section id="studentDashboard" class="hidden space-y-6">
-      <!-- 餘額與卡片區域 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- 餘額顯示卡片 -->
+        <!-- 目前薪金卡片 -->
         <div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl p-6 shadow-lg flex flex-col justify-between">
           <div>
-            <span class="text-indigo-100 text-sm font-medium">目前帳戶餘額</span>
+            <span class="text-indigo-100 text-sm font-medium">目前薪金餘額</span>
             <div class="text-4xl font-extrabold mt-2">
               $<span id="studentBalance">0</span>
             </div>
           </div>
           <div class="mt-4 text-xs text-indigo-200">
-            保持良好表現與每日答題可獲得獎勵金！
+            完成答題挑戰或獲得老師獎勵即可增加薪金！
           </div>
         </div>
 
-        <!-- 每日答題挑戰卡片 -->
+        <!-- 答題挑戰區 -->
         <div class="md:col-span-2 bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-brain text-indigo-500 mr-2"></i>每日答題挑戰</h3>
-              <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold">+ $50 獎勵金</span>
+              <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-gamepad text-indigo-500 mr-2"></i>答題挑戰區</h3>
+              <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold">+ $50 薪金</span>
             </div>
             <p id="quizQuestion" class="text-slate-600 text-sm font-medium mb-4">題目載入中...</p>
             
@@ -108,9 +107,9 @@
         </div>
       </div>
 
-      <!-- 出糧與交易歷史記錄表 -->
+      <!-- 出糧歷史紀錄 -->
       <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-100">
-        <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-clock-rotate-left text-indigo-500 mr-2"></i>出糧歷史與交易記錄</h3>
+        <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-receipt text-indigo-500 mr-2"></i>出糧歷史紀錄</h3>
         
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
@@ -118,12 +117,12 @@
               <tr class="border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
                 <th class="py-3 px-4">時間</th>
                 <th class="py-3 px-4">事由 / 說明</th>
-                <th class="py-3 px-4 text-right">金額變動</th>
+                <th class="py-3 px-4 text-right">薪金變動</th>
               </tr>
             </thead>
             <tbody id="studentHistoryTable" class="divide-y divide-slate-100 text-sm">
               <tr>
-                <td colspan="3" class="py-4 text-center text-slate-400">目前尚無記錄</td>
+                <td colspan="3" class="py-4 text-center text-slate-400">目前尚無出糧紀錄</td>
               </tr>
             </tbody>
           </table>
@@ -131,19 +130,19 @@
       </div>
     </section>
 
-    <!-- 3. 老師 / 管理員面板 (登入後若 is_admin == true 顯示) -->
+    <!-- 3. 老師管理面板 (當 is_admin == true 時顯示) -->
     <section id="adminDashboard" class="hidden space-y-6">
       <div class="bg-amber-500 text-white p-4 rounded-xl shadow mb-4 flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <i class="fa-solid fa-user-shield text-xl"></i>
-          <span class="font-bold">管理員控制台 (老師專用)</span>
+          <span class="font-bold">老師管理控制台 (Admin)</span>
         </div>
-        <span class="text-xs bg-amber-600 px-2 py-1 rounded">權限：Admin</span>
+        <span class="text-xs bg-amber-600 px-2.5 py-1 rounded-full font-medium">權限：is_admin = true</span>
       </div>
 
-      <!-- 調整學生餘額表單 -->
+      <!-- 手動加薪/扣薪表單 -->
       <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-100 max-w-2xl mx-auto">
-        <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-hand-holding-dollar text-indigo-500 mr-2"></i>發放津貼 / 扣款作業</h3>
+        <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-hand-holding-dollar text-indigo-500 mr-2"></i>手動加薪 / 扣薪操作</h3>
         
         <form id="adminAdjustForm" class="space-y-4">
           <div>
@@ -155,10 +154,10 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1">變動類型</label>
+              <label class="block text-sm font-medium text-slate-700 mb-1">調整類型</label>
               <select id="adminAdjustType" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                <option value="add">加薪 / 發放獎勵 (+)</option>
-                <option value="deduct">扣薪 / 處罰扣款 (-)</option>
+                <option value="add">加薪 (+)</option>
+                <option value="deduct">扣薪 (-)</option>
               </select>
             </div>
 
@@ -169,8 +168,8 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">事由 / 原因</label>
-            <input type="text" id="adminAdjustReason" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="例如：擔任班長認真負責 / 上課睡覺">
+            <label class="block text-sm font-medium text-slate-700 mb-1">加薪 / 扣薪原因</label>
+            <input type="text" id="adminAdjustReason" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="例如：擔任班長熱心服務 / 遲交作業">
           </div>
 
           <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg shadow transition duration-200">
@@ -183,9 +182,8 @@
 
   </main>
 
-  <!-- Firebase v10 模組化 SDK JavaScript 腳本 -->
+  <!-- Firebase v10 模組化 SDK 腳本 -->
   <script type="module">
-    // 引入 Firebase v10 模組
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { 
       getAuth, 
@@ -212,7 +210,7 @@
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // =========================================================================
-    // 1. Firebase 設定區 (請在此處替換為你自己的 Firebase 專案設定)
+    // 1. Firebase 設定區 (請將下方內容替換為你的 Firebase 通關密碼/Config)
     // =========================================================================
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
@@ -228,12 +226,12 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // 全域變數
+    // 全域狀態變數
     let currentUserData = null;
     let isRegisterMode = false;
-    let historyUnsubscribe = null; // 用於取消歷史記錄監聽
+    let historyUnsubscribe = null;
 
-    // UI 元素引用
+    // DOM 元素引用
     const authSection = document.getElementById('authSection');
     const authForm = document.getElementById('authForm');
     const authTitle = document.getElementById('authTitle');
@@ -258,10 +256,9 @@
     const adminMsg = document.getElementById('adminMsg');
 
     // =========================================================================
-    // 2. 身分驗證 (Auth) 與 切換模式邏輯
+    // 2. 登入與註冊切換邏輯 (Firebase Auth)
     // =========================================================================
 
-    // 切換 登入/註冊 模式
     toggleAuthModeBtn.addEventListener('click', () => {
       isRegisterMode = !isRegisterMode;
       authTitle.innerText = isRegisterMode ? '註冊新帳號' : '帳號登入';
@@ -273,7 +270,6 @@
       hideMsg(authMsg);
     });
 
-    // 表單提交：處理登入與註冊
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('authEmail').value;
@@ -283,15 +279,15 @@
 
       try {
         if (isRegisterMode) {
-          // 註冊流程
           if (!name.trim()) {
-            showMsg(authMsg, '請輸入姓名！', 'bg-red-100 text-red-700');
+            showMsg(authMsg, '請輸入真實姓名！', 'bg-red-100 text-red-700');
             return;
           }
+          // 建立 Auth 帳號
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
           const user = userCredential.user;
 
-          // 在 Firestore 創建用戶文件紀錄
+          // 寫入 Firestore 用戶資料表
           await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             name: name,
@@ -301,27 +297,26 @@
             createdAt: serverTimestamp()
           });
 
-          showMsg(authMsg, '註冊成功！系統為您跳轉中...', 'bg-green-100 text-green-700');
+          showMsg(authMsg, '註冊成功！系統準備為您跳轉...', 'bg-green-100 text-green-700');
         } else {
-          // 登入流程
+          // 登入
           await signInWithEmailAndPassword(auth, email, password);
         }
       } catch (error) {
         console.error("Auth Error:", error);
-        showMsg(authMsg, `失敗：${getAuthErrorMessage(error.code)}`, 'bg-red-100 text-red-700');
+        showMsg(authMsg, `操作失敗：${getAuthErrorMessage(error.code)}`, 'bg-red-100 text-red-700');
       }
     });
 
-    // 登出按鈕
     logoutBtn.addEventListener('click', () => {
       if (historyUnsubscribe) historyUnsubscribe();
       signOut(auth);
     });
 
-    // 監聽 User 登入狀態變更
+    // 監聽登入狀態變更
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // 取得使用者詳細資料
+        // 從 Firestore 獲取該用戶的詳細設定與權限 (is_admin)
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
 
@@ -329,7 +324,7 @@
           currentUserData = userSnap.data();
           renderUIByRole(currentUserData);
         } else {
-          console.error("找不到該使用者的 Firestore 文件");
+          console.error("找不到使用者資料！");
         }
       } else {
         // 未登入狀態
@@ -341,19 +336,19 @@
       }
     });
 
-    // 根據角色呈現 UI
+    // 根據 is_admin 欄位判斷顯示老師或學生介面
     function renderUIByRole(userData) {
       authSection.classList.add('hidden');
       userInfoHeader.classList.remove('hidden');
       userNameDisplay.innerText = `${userData.name} (${userData.is_admin ? '老師' : '學生'})`;
 
-      if (userData.is_admin) {
-        // 老師 (管理員) 介面
+      if (userData.is_admin === true) {
+        // 老師管理介面
         adminDashboard.classList.remove('hidden');
         studentDashboard.classList.add('hidden');
         loadStudentsList();
       } else {
-        // 學生 介面
+        // 學生介面
         studentDashboard.classList.remove('hidden');
         adminDashboard.classList.add('hidden');
         initStudentDashboard(userData.uid);
@@ -362,18 +357,18 @@
     }
 
     // =========================================================================
-    // 3. 學生功能區 (餘額顯示、歷史記錄實時監聽、每日答題)
+    // 3. 學生功能（薪金即時顯示、出糧歷史紀錄、答題挑戰區）
     // =========================================================================
 
     function initStudentDashboard(uid) {
-      // 1. 實時監聽學生餘額變動
+      // 即時監聽薪金餘額變動
       onSnapshot(doc(db, "users", uid), (docSnap) => {
         if (docSnap.exists()) {
           studentBalance.innerText = docSnap.data().balance || 0;
         }
       });
 
-      // 2. 實時監聽出糧與交易歷史記錄
+      // 即時監聽出糧歷史紀錄
       if (historyUnsubscribe) historyUnsubscribe();
       const q = query(
         collection(db, "transactions"),
@@ -384,7 +379,7 @@
       historyUnsubscribe = onSnapshot(q, (snapshot) => {
         studentHistoryTable.innerHTML = '';
         if (snapshot.empty) {
-          studentHistoryTable.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400">目前尚無記錄</td></tr>`;
+          studentHistoryTable.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400">目前尚無出糧紀錄</td></tr>`;
           return;
         }
 
@@ -407,32 +402,31 @@
       });
     }
 
-    // 每日答題挑戰題庫
-    const quizData = [
-      { q: "台灣最高峰是哪一座山？", options: ["雪山", "玉山", "陽明山", "阿里山"], answer: 1 },
-      { q: "程式語言中，HTML 的全稱是？", options: ["HyperText Markup Language", "High Tech Multi Language", "Home Tool Markup Language", "Hyperlink Text Mode Language"], answer: 0 },
-      { q: "下列哪一個數是質數 (Prime Number)？", options: ["15", "21", "29", "35"], answer: 2 },
-      { q: "光合作用中，植物吸收什麼氣體？", options: ["氧氣", "氮氣", "二氧化碳", "氫氣"], answer: 2 }
+    // 答題挑戰題庫
+    const quizList = [
+      { q: "請問 12 + 18 等於多少？", options: ["28", "30", "32", "34"], answer: 1 },
+      { q: "地球上最大的海洋是哪一個？", options: ["大西洋", "印度洋", "太平洋", "北冰洋"], answer: 2 },
+      { q: "一年當中有幾個月有 28 天？", options: ["1 個", "2 個", "6 個", "12 個"], answer: 3 },
+      { q: "植物進行光合作用主要需要吸收哪種氣體？", options: ["二氧化碳", "氧氣", "氮氣", "氦氣"], answer: 0 }
     ];
 
     function loadDailyQuiz() {
-      const quizContainer = document.getElementById('quizOptions');
-      const questionText = document.getElementById('quizQuestion');
+      const quizOptions = document.getElementById('quizOptions');
+      const quizQuestion = document.getElementById('quizQuestion');
       const quizFeedback = document.getElementById('quizFeedback');
       
       quizFeedback.classList.add('hidden');
-      quizContainer.innerHTML = '';
+      quizOptions.innerHTML = '';
 
-      // 隨機抽選一題
-      const randomQuiz = quizData[Math.floor(Math.random() * quizData.length)];
-      questionText.innerText = randomQuiz.q;
+      const currentQuiz = quizList[Math.floor(Math.random() * quizList.length)];
+      quizQuestion.innerText = currentQuiz.q;
 
-      randomQuiz.options.forEach((opt, index) => {
+      currentQuiz.options.forEach((opt, index) => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left px-4 py-2 border border-slate-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 transition duration-150 text-sm";
+        btn.className = "w-full text-left px-4 py-2 border border-slate-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 transition duration-150 text-sm font-medium";
         btn.innerText = `${index + 1}. ${opt}`;
-        btn.onclick = () => checkQuizAnswer(index, randomQuiz.answer);
-        quizContainer.appendChild(btn);
+        btn.onclick = () => checkQuizAnswer(index, currentQuiz.answer);
+        quizOptions.appendChild(btn);
       });
     }
 
@@ -442,46 +436,44 @@
 
       if (selectedIndex === correctIndex) {
         quizFeedback.className = "mt-3 text-sm font-semibold text-emerald-600";
-        quizFeedback.innerText = "🎉 答對了！自動派發獎勵金 $50 中...";
+        quizFeedback.innerText = "🎉 答對了！系統自動加薪 $50 中...";
 
         try {
           const rewardAmount = 50;
           const userRef = doc(db, "users", auth.currentUser.uid);
 
-          // 1. 更新 Firestore 餘額 (使用 increment 原子的加法)
+          // 1. 自動更新 Firestore 裡的薪金
           await updateDoc(userRef, {
             balance: increment(rewardAmount)
           });
 
-          // 2. 新增一筆交易歷史記錄
+          // 2. 寫入出糧歷史記錄
           await addDoc(collection(db, "transactions"), {
             userId: auth.currentUser.uid,
-            userName: currentUserData.name,
             amount: rewardAmount,
-            reason: "每日答題挑戰獎勵",
+            reason: "答題挑戰獎勵金",
             createdAt: serverTimestamp()
           });
 
-          quizFeedback.innerText = "✅ 答對了！$50 獎勵金已成功記入您的帳戶！";
-          // 重新載入新題目
-          setTimeout(loadDailyQuiz, 2500);
+          quizFeedback.innerText = "✅ 答對了！$50 薪金已成功核發！";
+          setTimeout(loadDailyQuiz, 2000);
 
         } catch (error) {
-          console.error("更新餘額失敗:", error);
+          console.error("更新薪金失敗:", error);
           quizFeedback.className = "mt-3 text-sm font-semibold text-red-600";
-          quizFeedback.innerText = "發放獎勵失敗，請確認資料庫設定！";
+          quizFeedback.innerText = "薪金更新失敗，請確認 Firestore 權限。";
         }
       } else {
         quizFeedback.className = "mt-3 text-sm font-semibold text-red-500";
-        quizFeedback.innerText = "❌ 答錯囉，再試一次吧！";
+        quizFeedback.innerText = "❌ 答錯了，再試試看吧！";
       }
     }
 
     // =========================================================================
-    // 4. 老師 / 管理員功能區 (加薪、扣薪、選學生)
+    // 4. 老師管理面板 (is_admin == true)
     // =========================================================================
 
-    // 載入所有學生名單下拉選單
+    // 載入學生下拉選單
     async function loadStudentsList() {
       adminStudentSelect.innerHTML = '<option value="">-- 請選擇學生 --</option>';
       
@@ -493,20 +485,20 @@
           const student = docSnap.data();
           const option = document.createElement('option');
           option.value = student.uid;
-          option.innerText = `${student.name} (${student.email}) - 目前餘額: $${student.balance || 0}`;
+          option.innerText = `${student.name} (${student.email}) | 目前薪金: $${student.balance || 0}`;
           adminStudentSelect.appendChild(option);
         });
       } catch (error) {
-        console.error("載入學生名單失敗:", error);
+        console.error("載入學生列表失敗:", error);
       }
     }
 
-    // 老師調整學生餘額表單提交
+    // 老師手動加薪 / 扣薪表單處理
     adminAdjustForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
       const studentUid = adminStudentSelect.value;
-      const type = document.getElementById('adminAdjustType').value;
+      const adjustType = document.getElementById('adminAdjustType').value;
       let amount = parseInt(document.getElementById('adminAdjustAmount').value, 10);
       const reason = document.getElementById('adminAdjustReason').value;
 
@@ -515,19 +507,18 @@
         return;
       }
 
-      // 若為扣款，將金額轉為負數
-      if (type === 'deduct') {
-        amount = -Math.abs(amount);
+      if (adjustType === 'deduct') {
+        amount = -Math.abs(amount); // 扣薪轉負數
       }
 
       try {
-        // 1. 更新指定學生的 Firestore 餘額
+        // 1. 更新學生的薪金
         const studentRef = doc(db, "users", studentUid);
         await updateDoc(studentRef, {
           balance: increment(amount)
         });
 
-        // 2. 新增交易記錄
+        // 2. 寫入交易與出糧歷史記錄
         await addDoc(collection(db, "transactions"), {
           userId: studentUid,
           amount: amount,
@@ -535,20 +526,20 @@
           createdAt: serverTimestamp()
         });
 
-        showMsg(adminMsg, '調整成功！金額已即時更新。', 'bg-green-100 text-green-700');
+        showMsg(adminMsg, '成功送出調整！學生薪金已更新。', 'bg-green-100 text-green-700');
         adminAdjustForm.reset();
         
-        // 刷新學生下拉選單顯示最新餘額
+        // 刷新學生下拉選單數值
         loadStudentsList();
 
       } catch (error) {
-        console.error("調整餘額失敗:", error);
+        console.error("手動調整薪金失敗:", error);
         showMsg(adminMsg, '調整失敗，請檢查權限設定！', 'bg-red-100 text-red-700');
       }
     });
 
     // =========================================================================
-    // 5. 輔助函式 (訊息顯示與錯誤轉換)
+    // 5. 輔助函式
     // =========================================================================
 
     function showMsg(element, text, classes) {
@@ -563,10 +554,10 @@
 
     function getAuthErrorMessage(code) {
       switch (code) {
-        case 'auth/invalid-email': return '無效的電子郵件格式';
+        case 'auth/invalid-email': return 'Email 格式不正確';
         case 'auth/user-not-found': return '找不到該帳號';
         case 'auth/wrong-password': return '密碼錯誤';
-        case 'auth/email-already-in-use': return '該電子郵件已被註冊';
+        case 'auth/email-already-in-use': return '該 Email 已被註冊';
         case 'auth/weak-password': return '密碼長度太短（最少需要 6 個字元）';
         default: return '發生錯誤，請稍後再試';
       }
