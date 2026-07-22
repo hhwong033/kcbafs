@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>班級經濟與投資系統</title>
+  <title>班級經濟與 MPF 投資系統</title>
   <!-- 引入 Tailwind CSS 美化介面 -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -12,8 +12,8 @@
   <div class="max-w-md mx-auto p-4">
     <!-- 頁頭 -->
     <header class="text-center my-4">
-      <h1 class="text-2xl font-extrabold text-indigo-600">🏫 班級經濟系統</h1>
-      <p class="text-xs text-slate-500">學習．賺薪．排行榜．理財投資</p>
+      <h1 class="text-2xl font-extrabold text-indigo-600">🏫 班級經濟與 MPF 系統</h1>
+      <p class="text-xs text-slate-500">學習．出糧．MPF強積金．理財投資</p>
     </header>
 
     <!-- 1. 登入區塊 -->
@@ -45,20 +45,41 @@
         <button id="btn-logout" class="text-xs text-red-500 hover:underline">登出</button>
       </div>
 
-      <!-- 👑 老師專屬管理面板 (非管理員自動隱藏) -->
-      <div id="admin-panel" class="bg-amber-50 border border-amber-200 p-4 rounded-xl hidden space-y-2">
-        <h3 class="font-bold text-amber-800 text-xs">👑 老師手動調整薪金</h3>
-        <input type="email" id="admin-target-email" placeholder="學生 Email" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
-        <input type="number" id="admin-amount" placeholder="金額 (+100 或 -50)" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
-        <input type="text" id="admin-reason" placeholder="原因 (如: 作業優良)" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
-        <button id="btn-admin-adjust" class="w-full bg-amber-600 text-white font-bold py-1.5 rounded text-xs">發放 / 扣除</button>
+      <!-- 👑 老師專屬管理面板 -->
+      <div id="admin-panel" class="bg-amber-50 border border-amber-200 p-4 rounded-xl hidden space-y-3">
+        <h3 class="font-bold text-amber-800 text-xs flex items-center gap-1">👑 老師管理功能</h3>
+        
+        <!-- 手動加薪/扣薪 -->
+        <div class="space-y-1.5 border-b border-amber-200 pb-3">
+          <p class="text-[11px] font-semibold text-amber-700">發放工作薪金 (進入待出糧金額)</p>
+          <input type="email" id="admin-target-email" placeholder="學生 Email" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
+          <input type="number" id="admin-amount" placeholder="金額 (+1000 或 -500)" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
+          <input type="text" id="admin-reason" placeholder="原因 (如: 班長崗位津貼)" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
+          <button id="btn-admin-adjust" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-1.5 rounded text-xs transition">記錄本月薪金</button>
+        </div>
+
+        <!-- 🗓️ 月結一鍵出糧 (香港 MPF 結算) -->
+        <div>
+          <p class="text-[11px] font-semibold text-amber-700">🗓️ 月底出糧結算</p>
+          <p class="text-[10px] text-amber-600 mb-1.5">將全班「待出糧金額」依香港 MPF 法例扣除供款後發放至活期戶口。</p>
+          <button id="btn-admin-mpf-payroll" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded text-xs transition shadow-sm">執行全班月底 MPF 出糧結算</button>
+        </div>
       </div>
 
       <!-- ================= 頁面 1：答題賺薪 ================= -->
       <div id="tab-questions" class="tab-content space-y-4">
+        <!-- 本月待出糧卡片 -->
+        <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl flex justify-between items-center">
+          <div>
+            <p class="text-xs text-indigo-600 font-semibold">⏳ 本月待出糧金額 (月底結算)</p>
+            <h3 class="text-2xl font-extrabold text-indigo-900 mt-0.5">$ <span id="accrued-salary-amount">0</span></h3>
+          </div>
+          <span class="text-2xl">💵</span>
+        </div>
+
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
           <h3 class="font-bold text-indigo-600 mb-2 flex items-center gap-1">🎯 每日答題挑戰</h3>
-          <p class="text-sm text-slate-600 mb-3">題目：<strong>台灣最高峰是哪一座山？</strong> <br><span class="text-xs text-amber-600 font-bold">(答對獎金 +$20)</span></p>
+          <p class="text-sm text-slate-600 mb-3">題目：<strong>台灣最高峰是哪一座山？</strong> <br><span class="text-xs text-amber-600 font-bold">(答對獎酬 +$1,000 入本月待出糧)</span></p>
           <div class="flex gap-2">
             <input type="text" id="answer-input" placeholder="請輸入答案..." class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
             <button id="btn-submit-answer" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition">提交</button>
@@ -70,24 +91,47 @@
       <!-- ================= 頁面 2：排行榜 ================= -->
       <div id="tab-leaderboard" class="tab-content space-y-4 hidden">
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-          <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-1 text-base">🏆 全班薪金排行榜</h3>
+          <h3 class="font-bold text-slate-700 mb-1 flex items-center gap-1 text-base">🏆 全班財富總榜</h3>
+          <p class="text-[11px] text-slate-400 mb-3">總財富 = 活期戶口 + 投資戶口 + MPF強積金</p>
           <div id="leaderboard-list" class="space-y-2 text-xs">
             <p class="text-slate-400 text-center py-4">載入排行榜中...</p>
           </div>
         </div>
       </div>
 
-      <!-- ================= 頁面 3：我的薪金與紀錄 ================= -->
+      <!-- ================= 頁面 3：我的財富與紀錄 ================= -->
       <div id="tab-wallet" class="tab-content space-y-4 hidden">
-        <!-- 薪金總額卡片 -->
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-5 rounded-2xl shadow-md text-center">
-          <p class="text-xs opacity-80">可支配薪金餘額</p>
-          <h2 class="text-3xl font-extrabold mt-1">$ <span id="salary-amount">0</span></h2>
+        <!-- 財富三部分總覽 -->
+        <div class="grid grid-cols-3 gap-2">
+          <!-- 1. 活期戶口 -->
+          <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
+            <p class="text-[10px] text-slate-400 font-semibold">💳 活期戶口</p>
+            <p class="text-base font-extrabold text-indigo-600 mt-1">$<span id="current-account-amount">0</span></p>
+          </div>
+          <!-- 2. 投資戶口 -->
+          <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
+            <p class="text-[10px] text-slate-400 font-semibold">📈 投資戶口</p>
+            <p class="text-base font-extrabold text-emerald-600 mt-1">$<span id="investment-account-amount">0</span></p>
+          </div>
+          <!-- 3. 強積金戶口 -->
+          <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
+            <p class="text-[10px] text-slate-400 font-semibold">🛡️ MPF強積金</p>
+            <p class="text-base font-extrabold text-amber-600 mt-1">$<span id="mpf-account-amount">0</span></p>
+          </div>
+        </div>
+
+        <!-- 本月待出糧提示卡片 -->
+        <div class="bg-slate-800 text-white p-4 rounded-xl text-xs flex justify-between items-center shadow-sm">
+          <div>
+            <p class="text-slate-400">⏳ 本月累積發放（待月底出糧）</p>
+            <p class="text-lg font-bold text-amber-400 mt-0.5">$<span id="wallet-accrued-amount">0</span></p>
+          </div>
+          <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">月底自動結算</span>
         </div>
 
         <!-- 歷史紀錄 -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-          <h3 class="font-bold text-slate-700 mb-3 text-sm">📜 最近出糧與變動記錄</h3>
+          <h3 class="font-bold text-slate-700 mb-3 text-sm">📜 出糧與交易紀錄</h3>
           <ul id="ledger-list" class="space-y-2 text-xs text-slate-600">
             <li class="text-slate-400 text-center py-2">尚無交易記錄</li>
           </ul>
@@ -97,19 +141,20 @@
       <!-- ================= 頁面 4：投資中心 ================= -->
       <div id="tab-investment" class="tab-content space-y-4 hidden">
         <div class="bg-gradient-to-br from-emerald-500 to-teal-700 text-white p-5 rounded-2xl shadow-md text-center">
-          <p class="text-xs opacity-80">投資帳戶總額</p>
-          <h2 class="text-3xl font-extrabold mt-1">$ <span id="investment-amount">0</span></h2>
+          <p class="text-xs opacity-80">投資戶口總額</p>
+          <h2 class="text-3xl font-extrabold mt-1">$ <span id="invest-page-balance">0</span></h2>
+          <p class="text-[10px] opacity-70 mt-1">資金源自「活期戶口」轉入</p>
         </div>
 
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-          <h3 class="font-bold text-emerald-700 text-sm">📈 薪金轉投資儲蓄</h3>
-          <p class="text-xs text-slate-500">你可以將可支配薪金存入投資帳戶，也可以隨時提領回薪金帳戶。</p>
+          <h3 class="font-bold text-emerald-700 text-sm">📈 活期薪金轉投資</h3>
+          <p class="text-xs text-slate-500">你可以將「活期戶口」的資金轉入投資戶口賺取收益，也可隨時提領回活期戶口。</p>
           
           <input type="number" id="invest-input-amount" placeholder="輸入金額" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none">
           
           <div class="grid grid-cols-2 gap-2">
             <button id="btn-invest-deposit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition">轉入投資 (+)</button>
-            <button id="btn-invest-withdraw" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 rounded-lg text-xs transition">提領至薪金 (-)</button>
+            <button id="btn-invest-withdraw" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 rounded-lg text-xs transition">提領至活期 (-)</button>
           </div>
           <p id="invest-feedback" class="text-xs mt-1 hidden"></p>
         </div>
@@ -130,7 +175,7 @@
     </button>
     <button onclick="switchTab('tab-wallet', this)" class="nav-btn flex flex-col items-center text-slate-400 text-[11px]">
       <span class="text-base">💰</span>
-      <span>我的薪金</span>
+      <span>我的財富</span>
     </button>
     <button onclick="switchTab('tab-investment', this)" class="nav-btn flex flex-col items-center text-slate-400 text-[11px]">
       <span class="text-base">📈</span>
@@ -169,7 +214,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // DOM 元素引用
+    // DOM 元素
     const loginCard = document.getElementById('login-card');
     const mainDashboard = document.getElementById('main-dashboard');
     const bottomNav = document.getElementById('bottom-nav');
@@ -177,8 +222,15 @@
     const loginError = document.getElementById('login-error');
     const userDisplayName = document.getElementById('user-display-name');
     const userRoleBadge = document.getElementById('user-role-badge');
-    const salaryAmount = document.getElementById('salary-amount');
-    const investmentAmount = document.getElementById('investment-amount');
+
+    // 帳戶金額顯示元素
+    const accruedSalaryAmount = document.getElementById('accrued-salary-amount');
+    const currentAccountAmount = document.getElementById('current-account-amount');
+    const investmentAccountAmount = document.getElementById('investment-account-amount');
+    const mpfAccountAmount = document.getElementById('mpf-account-amount');
+    const walletAccruedAmount = document.getElementById('wallet-accrued-amount');
+    const investPageBalance = document.getElementById('invest-page-balance');
+
     const btnLogout = document.getElementById('btn-logout');
     const ledgerList = document.getElementById('ledger-list');
 
@@ -202,7 +254,7 @@
       if (tabId === 'tab-leaderboard') loadLeaderboard();
     }
 
-    // 登入功能
+    // 登入
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       loginError.classList.add('hidden');
@@ -214,10 +266,10 @@
       }
     });
 
-    // 登出功能
+    // 登出
     btnLogout.addEventListener('click', () => signOut(auth));
 
-    // 監聽使用者登入狀態
+    // 監聽登入狀態
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
@@ -237,18 +289,20 @@
       }
     });
 
-    // 即時同步個人資料及姓名檢查
+    // 即時監聽個人資料與三大戶口
     async function setupUserRealtime(user) {
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
 
-      // 如果是全新使用者，建立初始化紀錄
+      // 初始化全新使用者 (加入三大戶口 + 本月待出糧欄位)
       if (!userSnap.exists()) {
         await setDoc(userRef, {
           email: user.email,
           display_name: "",
-          current_salary: 0,
-          investment_balance: 0,
+          accrued_salary: 0,        // 本月待出糧薪金
+          current_account: 0,       // 活期戶口
+          investment_account: 0,    // 投資戶口
+          mpf_account: 0,           // 強積金戶口
           is_admin: false
         });
       }
@@ -256,10 +310,21 @@
       unsubscribeUserDoc = onSnapshot(userRef, (docSnap) => {
         if (docSnap.exists()) {
           currentUserData = docSnap.data();
-          salaryAmount.textContent = currentUserData.current_salary || 0;
-          investmentAmount.textContent = currentUserData.investment_balance || 0;
 
-          // 🔍 檢查是否為首次登入 (無姓名)
+          // 處理數據相容性 (若舊數據沒有三戶口則給預設值 0)
+          const accrued = currentUserData.accrued_salary || 0;
+          const current = currentUserData.current_account || currentUserData.current_salary || 0;
+          const invest = currentUserData.investment_account || currentUserData.investment_balance || 0;
+          const mpf = currentUserData.mpf_account || 0;
+
+          accruedSalaryAmount.textContent = accrued;
+          walletAccruedAmount.textContent = accrued;
+          currentAccountAmount.textContent = current;
+          investmentAccountAmount.textContent = invest;
+          investPageBalance.textContent = invest;
+          mpfAccountAmount.textContent = mpf;
+
+          // 首次登入姓名檢查
           if (!currentUserData.display_name || currentUserData.display_name.trim() === "") {
             document.getElementById('name-modal').classList.remove('hidden');
           } else {
@@ -267,7 +332,7 @@
             userDisplayName.textContent = `${currentUserData.display_name} (${user.email.split('@')[0]})`;
           }
 
-          // 判斷管理員權限
+          // 管理員身份
           if (currentUserData.is_admin) {
             userRoleBadge.textContent = "老師/管理員";
             userRoleBadge.className = "text-[10px] inline-block bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold";
@@ -281,7 +346,7 @@
       });
     }
 
-    // 儲存姓名按鈕事件
+    // 儲存姓名
     document.getElementById('btn-save-name').addEventListener('click', async () => {
       const nameInput = document.getElementById('setup-display-name').value.trim();
       if (!nameInput) {
@@ -298,34 +363,48 @@
       }
     });
 
-    // 載入排行榜 (優先顯示 display_name)
+    // 載入全班總財富排行榜 (活期 + 投資 + MPF)
     async function loadLeaderboard() {
       const leaderboardList = document.getElementById('leaderboard-list');
       leaderboardList.innerHTML = '<p class="text-slate-400 text-center py-2">載入中...</p>';
 
       try {
-        const q = query(collection(db, 'users'), orderBy('current_salary', 'desc'), limit(10));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        let studentList = [];
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const current = data.current_account || data.current_salary || 0;
+          const invest = data.investment_account || data.investment_balance || 0;
+          const mpf = data.mpf_account || 0;
+          const totalWealth = current + invest + mpf;
+
+          studentList.push({
+            displayName: data.display_name || data.email.split('@')[0],
+            totalWealth: totalWealth,
+            current: current
+          });
+        });
+
+        // 依總財富降序排序
+        studentList.sort((a, b) => b.totalWealth - a.totalWealth);
 
         leaderboardList.innerHTML = '';
         let rank = 1;
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
+        studentList.slice(0, 10).forEach((student) => {
           let medal = `第 ${rank} 名`;
           if (rank === 1) medal = '🥇 冠軍';
           if (rank === 2) medal = '🥈 亞軍';
           if (rank === 3) medal = '🥉 季軍';
-
-          const displayName = data.display_name || data.email.split('@')[0];
 
           const item = document.createElement('div');
           item.className = "flex justify-between items-center p-2.5 bg-slate-50 rounded-lg border border-slate-100";
           item.innerHTML = `
             <div class="flex items-center gap-2">
               <span class="font-bold text-slate-500 w-12">${medal}</span>
-              <span class="font-semibold text-slate-700">${displayName}</span>
+              <span class="font-semibold text-slate-700">${student.displayName}</span>
             </div>
-            <span class="font-extrabold text-indigo-600">$${data.current_salary || 0}</span>
+            <span class="font-extrabold text-indigo-600">$${student.totalWealth}</span>
           `;
           leaderboardList.appendChild(item);
           rank++;
@@ -335,7 +414,7 @@
       }
     }
 
-    // 載入個人交易記錄
+    // 載入交易紀錄
     function loadLedger(email) {
       const q = query(collection(db, 'ledger'), where('student_email', '==', email));
       unsubscribeLedger = onSnapshot(q, (snapshot) => {
@@ -350,7 +429,7 @@
           const isPositive = item.amount >= 0;
           li.className = "flex justify-between items-center p-2 bg-slate-50 rounded border border-slate-100";
           li.innerHTML = `
-            <span>${item.reason || '薪金變動'}</span>
+            <span>${item.reason || '交易紀錄'}</span>
             <span class="font-bold ${isPositive ? 'text-green-600' : 'text-red-500'}">
               ${isPositive ? '+' : ''}${item.amount}
             </span>
@@ -360,7 +439,7 @@
       });
     }
 
-    // 答題邏輯
+    // 答題邏輯 (金額注入 accrued_salary)
     document.getElementById('btn-submit-answer').addEventListener('click', async () => {
       const input = document.getElementById('answer-input').value.trim();
       const feedback = document.getElementById('answer-feedback');
@@ -368,14 +447,14 @@
 
       if (input === "玉山") {
         feedback.className = "text-xs mt-2 text-green-600 font-bold";
-        feedback.textContent = "🎉 答對了！已發放獎金 $20！";
+        feedback.textContent = "🎉 答對了！$1,000 已記入本月待出糧金額（月底結算）！";
         
         const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, { current_salary: increment(20) });
+        await updateDoc(userRef, { accrued_salary: increment(1000) });
         await addDoc(collection(db, 'ledger'), {
           student_email: currentUser.email,
-          amount: 20,
-          reason: "答對問題：台灣最高峰",
+          amount: 1000,
+          reason: "答對問題 (記入待出糧薪金)",
           created_at: new Date()
         });
       } else {
@@ -384,11 +463,13 @@
       }
     });
 
-    // 投資中心：轉入存款 (Deposit)
+    // 投資中心：轉入存款 (活期 -> 投資)
     document.getElementById('btn-invest-deposit').addEventListener('click', async () => {
       const amount = parseInt(document.getElementById('invest-input-amount').value);
       const feedback = document.getElementById('invest-feedback');
       feedback.classList.remove('hidden');
+
+      const currentBalance = currentUserData.current_account || currentUserData.current_salary || 0;
 
       if (isNaN(amount) || amount <= 0) {
         feedback.className = "text-xs text-red-500";
@@ -396,34 +477,36 @@
         return;
       }
 
-      if ((currentUserData.current_salary || 0) < amount) {
+      if (currentBalance < amount) {
         feedback.className = "text-xs text-red-500";
-        feedback.textContent = "薪金餘額不足，無法轉入！";
+        feedback.textContent = "活期戶口餘額不足！";
         return;
       }
 
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
-        current_salary: increment(-amount),
-        investment_balance: increment(amount)
+        current_account: increment(-amount),
+        investment_account: increment(amount)
       });
       await addDoc(collection(db, 'ledger'), {
         student_email: currentUser.email,
         amount: -amount,
-        reason: "轉入投資帳戶",
+        reason: "活期轉入投資戶口",
         created_at: new Date()
       });
 
       feedback.className = "text-xs text-green-600 font-bold";
-      feedback.textContent = `成功轉入 $${amount} 至投資帳戶！`;
+      feedback.textContent = `成功轉入 $${amount} 至投資戶口！`;
       document.getElementById('invest-input-amount').value = '';
     });
 
-    // 投資中心：提領存款 (Withdraw)
+    // 投資中心：提領存款 (投資 -> 活期)
     document.getElementById('btn-invest-withdraw').addEventListener('click', async () => {
       const amount = parseInt(document.getElementById('invest-input-amount').value);
       const feedback = document.getElementById('invest-feedback');
       feedback.classList.remove('hidden');
+
+      const investBalance = currentUserData.investment_account || currentUserData.investment_balance || 0;
 
       if (isNaN(amount) || amount <= 0) {
         feedback.className = "text-xs text-red-500";
@@ -431,30 +514,30 @@
         return;
       }
 
-      if ((currentUserData.investment_balance || 0) < amount) {
+      if (investBalance < amount) {
         feedback.className = "text-xs text-red-500";
-        feedback.textContent = "投資帳戶餘額不足！";
+        feedback.textContent = "投資戶口餘額不足！";
         return;
       }
 
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
-        current_salary: increment(amount),
-        investment_balance: increment(-amount)
+        current_account: increment(amount),
+        investment_account: increment(-amount)
       });
       await addDoc(collection(db, 'ledger'), {
         student_email: currentUser.email,
         amount: amount,
-        reason: "從投資帳戶提領",
+        reason: "投資戶口提領至活期",
         created_at: new Date()
       });
 
       feedback.className = "text-xs text-green-600 font-bold";
-      feedback.textContent = `成功提領 $${amount} 回薪金帳戶！`;
+      feedback.textContent = `成功提領 $${amount} 回活期戶口！`;
       document.getElementById('invest-input-amount').value = '';
     });
 
-    // 老師手動調整薪金
+    // 老師手動上記薪金 (注入 accrued_salary)
     document.getElementById('btn-admin-adjust').addEventListener('click', async () => {
       const targetEmail = document.getElementById('admin-target-email').value.trim();
       const amount = parseInt(document.getElementById('admin-amount').value);
@@ -475,20 +558,86 @@
         }
 
         querySnapshot.forEach(async (studentDoc) => {
-          await updateDoc(doc(db, 'users', studentDoc.id), { current_salary: increment(amount) });
+          await updateDoc(doc(db, 'users', studentDoc.id), { accrued_salary: increment(amount) });
           await addDoc(collection(db, 'ledger'), {
             student_email: targetEmail,
             amount: amount,
-            reason: `[老師發放] ${reason}`,
+            reason: `[老師上記待出糧] ${reason}`,
             created_at: new Date()
           });
         });
 
-        alert("調整成功！");
+        alert("記錄成功！已注入該學生本月待出糧金額。");
         document.getElementById('admin-amount').value = '';
         document.getElementById('admin-reason').value = '';
       } catch (err) {
         alert("執行失敗：" + err.message);
+      }
+    });
+
+    // 🗓️ 老師月底一鍵 MPF 結算與出糧
+    document.getElementById('btn-admin-mpf-payroll').addEventListener('click', async () => {
+      if (!confirm("確定要執行【全班月底 MPF 結算與出糧】嗎？系統將依香港 MPF 法例計算供款並入賬。")) return;
+
+      try {
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        let count = 0;
+
+        for (const studentDoc of querySnapshot.docs) {
+          const data = studentDoc.data();
+          const grossSalary = data.accrued_salary || 0;
+
+          if (grossSalary > 0) {
+            // 香港 MPF 法例計算邏輯
+            let employeeMPF = 0;
+            let employerMPF = 0;
+
+            if (grossSalary < 7100) {
+              // 免供款界線：僱員 $0，僱主 5%
+              employeeMPF = 0;
+              employerMPF = Math.round(grossSalary * 0.05);
+            } else if (grossSalary <= 30000) {
+              // 標準界線：雙方各 5%
+              employeeMPF = Math.round(grossSalary * 0.05);
+              employerMPF = Math.round(grossSalary * 0.05);
+            } else {
+              // 上限界線 ($30,000 上限)
+              employeeMPF = 1500;
+              employerMPF = 1500;
+            }
+
+            const netSalary = grossSalary - employeeMPF; // 扣除 MPF 後實收薪金 (入活期)
+            const totalMPFContribution = employeeMPF + employerMPF; // 總強積金注入
+
+            // 更新數據：Reset 待出糧，注入活期與 MPF 戶口
+            await updateDoc(doc(db, 'users', studentDoc.id), {
+              accrued_salary: 0,
+              current_account: increment(netSalary),
+              mpf_account: increment(totalMPFContribution)
+            });
+
+            // 寫入交易紀錄
+            await addDoc(collection(db, 'ledger'), {
+              student_email: data.email,
+              amount: netSalary,
+              reason: `[月底出糧] 總薪金$${grossSalary} (扣僱員MPF $${employeeMPF})`,
+              created_at: new Date()
+            });
+
+            await addDoc(collection(db, 'ledger'), {
+              student_email: data.email,
+              amount: totalMPFContribution,
+              reason: `[MPF強積金注入] 僱員$${employeeMPF} + 僱主$${employerMPF}`,
+              created_at: new Date()
+            });
+
+            count++;
+          }
+        }
+
+        alert(`月結完成！已處理 ${count} 位學生的出糧與 MPF 計算。`);
+      } catch (err) {
+        alert("月結出糧失敗：" + err.message);
       }
     });
   </script>
