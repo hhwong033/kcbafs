@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>班級經濟與 DSE BAFS 企會財系統 - 出題管理版</title>
+  <title>班級經濟與 DSE BAFS 企會財系統 - 港股模擬交易</title>
   <!-- 引入 Tailwind CSS 美化介面 -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -13,7 +13,7 @@
     <!-- 頁頭 -->
     <header class="text-center my-4">
       <h1 class="text-2xl font-extrabold text-indigo-600">🏫 班級經濟 × DSE 企會財</h1>
-      <p class="text-xs text-slate-500">BAFS 卷一無限挑戰．動態雲端出題．港股模擬交易</p>
+      <p class="text-xs text-slate-500">BAFS 卷一分科挑戰．選項動態洗牌．港股模擬交易</p>
     </header>
 
     <!-- 1. 登入區塊 -->
@@ -45,116 +45,28 @@
         <button id="btn-logout" class="text-xs text-red-500 hover:underline">登出</button>
       </div>
 
-      <!-- 👑 老師專屬管理面板 (含出題管理) -->
-      <div id="admin-panel" class="bg-amber-50 border border-amber-200 p-4 rounded-xl hidden space-y-4">
-        <h3 class="font-bold text-amber-800 text-xs flex items-center justify-between">
-          <span>👑 老師管理功能</span>
-          <span class="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-bold">管理員權限</span>
-        </h3>
+      <!-- 👑 老師專屬管理面板 -->
+      <div id="admin-panel" class="bg-amber-50 border border-amber-200 p-4 rounded-xl hidden space-y-3">
+        <h3 class="font-bold text-amber-800 text-xs flex items-center gap-1">👑 老師管理功能</h3>
         
-        <!-- 管理子分頁標籤 -->
-        <div class="flex gap-2 border-b border-amber-200 pb-2">
-          <button type="button" onclick="switchAdminTab('admin-tab-payroll')" id="btn-admin-tab-payroll" class="admin-tab-btn text-xs font-bold text-amber-800 border-b-2 border-amber-700 pb-1">💵 薪金與結算</button>
-          <button type="button" onclick="switchAdminTab('admin-tab-questions')" id="btn-admin-tab-questions" class="admin-tab-btn text-xs text-amber-600 pb-1">📝 出題管理面板</button>
+        <!-- 手動加薪/扣薪 -->
+        <div class="space-y-1.5 border-b border-amber-200 pb-3">
+          <p class="text-[11px] font-semibold text-amber-700">發放工作薪金 (進入待出糧金額)</p>
+          <input type="email" id="admin-target-email" placeholder="學生 Email" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
+          <input type="number" id="admin-amount" placeholder="金額 (+1000 或 -500)" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
+          <input type="text" id="admin-reason" placeholder="原因 (如: 班長崗位津貼)" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
+          <button id="btn-admin-adjust" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-1.5 rounded text-xs transition">記錄本月薪金</button>
         </div>
 
-        <!-- 區塊 A：薪金與結算 -->
-        <div id="admin-tab-payroll" class="admin-subtab-content space-y-3">
-          <!-- 手動加薪/扣薪 -->
-          <div class="space-y-1.5 border-b border-amber-200 pb-3">
-            <p class="text-[11px] font-semibold text-amber-700">發放工作薪金 (進入待出糧金額)</p>
-            <input type="email" id="admin-target-email" placeholder="學生 Email" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
-            <input type="number" id="admin-amount" placeholder="金額 (+1000 或 -500)" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
-            <input type="text" id="admin-reason" placeholder="原因 (如: 班長崗位津貼)" class="w-full px-3 py-1.5 border border-amber-300 rounded text-xs bg-white">
-            <button id="btn-admin-adjust" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-1.5 rounded text-xs transition">記錄本月薪金</button>
-          </div>
-
-          <!-- 🗓️ 月結一鍵出糧 (香港 MPF 結算) -->
-          <div>
-            <p class="text-[11px] font-semibold text-amber-700">🗓️ 月底出糧結算</p>
-            <p class="text-[10px] text-amber-600 mb-1.5">將全班「待出糧金額」依香港 MPF 法例扣除供款後發放至活期戶口。</p>
-            <button id="btn-admin-mpf-payroll" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded text-xs transition shadow-sm">執行全班月底 MPF 出糧結算</button>
-          </div>
+        <!-- 🗓️ 月結一鍵出糧 (香港 MPF 結算) -->
+        <div>
+          <p class="text-[11px] font-semibold text-amber-700">🗓️ 月底出糧結算</p>
+          <p class="text-[10px] text-amber-600 mb-1.5">將全班「待出糧金額」依香港 MPF 法例扣除供款後發放至活期戶口。</p>
+          <button id="btn-admin-mpf-payroll" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded text-xs transition shadow-sm">執行全班月底 MPF 出糧結算</button>
         </div>
-
-        <!-- 區塊 B：線上出題管理面板 -->
-        <div id="admin-tab-questions" class="admin-subtab-content space-y-3 hidden">
-          <p class="text-[11px] font-bold text-amber-800">➕ 新增 DSE BAFS 挑戰題目</p>
-          
-          <div class="space-y-2 bg-white p-3 rounded-lg border border-amber-200 text-xs">
-            <div>
-              <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">題目範疇/分類</label>
-              <select id="q-add-category" class="w-full p-1.5 border border-slate-300 rounded bg-slate-50 text-xs">
-                <option value="DSE BAFS 卷一：會計導論">DSE BAFS 卷一：會計導論</option>
-                <option value="DSE BAFS 卷一：管理基礎">DSE BAFS 卷一：管理基礎</option>
-                <option value="DSE BAFS 卷一：商業環境">DSE BAFS 卷一：商業環境</option>
-                <option value="DSE BAFS 卷一：個人理財">DSE BAFS 卷一：個人理財</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">題目內容</label>
-              <textarea id="q-add-text" rows="2" placeholder="請輸入問題內容..." class="w-full p-1.5 border border-slate-300 rounded text-xs"></textarea>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">選項 1</label>
-                <input type="text" id="q-add-opt1" placeholder="選項 1" class="w-full p-1.5 border border-slate-300 rounded">
-              </div>
-              <div>
-                <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">選項 2</label>
-                <input type="text" id="q-add-opt2" placeholder="選項 2" class="w-full p-1.5 border border-slate-300 rounded">
-              </div>
-              <div>
-                <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">選項 3</label>
-                <input type="text" id="q-add-opt3" placeholder="選項 3" class="w-full p-1.5 border border-slate-300 rounded">
-              </div>
-              <div>
-                <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">選項 4</label>
-                <input type="text" id="q-add-opt4" placeholder="選項 4" class="w-full p-1.5 border border-slate-300 rounded">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">正確答案是哪個？</label>
-                <select id="q-add-correct-index" class="w-full p-1.5 border border-slate-300 rounded bg-green-50 text-green-800 font-bold">
-                  <option value="0">選項 1 為正確答案</option>
-                  <option value="1">選項 2 為正確答案</option>
-                  <option value="2">選項 3 為正確答案</option>
-                  <option value="3">選項 4 為正確答案</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">答對獎酬 ($)</label>
-                <input type="number" id="q-add-reward" value="1000" class="w-full p-1.5 border border-slate-300 rounded font-bold text-amber-600">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">答案解析與詳細說明</label>
-              <textarea id="q-add-explanation" rows="2" placeholder="請輸入對此題目的解析說明..." class="w-full p-1.5 border border-slate-300 rounded text-xs"></textarea>
-            </div>
-
-            <button id="btn-add-question" type="button" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded transition">發布新題目至系統 🚀</button>
-          </div>
-
-          <!-- 已上架題目列表 -->
-          <div class="pt-2">
-            <p class="text-[11px] font-bold text-amber-800 mb-1 flex justify-between items-center">
-              <span>📋 雲端題庫清單</span>
-              <span id="question-count-tag" class="text-[10px] bg-amber-200 px-1.5 py-0.5 rounded">0 題</span>
-            </p>
-            <div id="admin-questions-list" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-              <p class="text-slate-400 text-[10px] text-center py-2">載入題庫中...</p>
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <!-- ================= 頁面 1：DSE BAFS 答題賺薪 (雲端動態抽題) ================= -->
+      <!-- ================= 頁面 1：DSE BAFS 答題賺薪 (三大主題自由選擇) ================= -->
       <div id="tab-questions" class="tab-content space-y-4">
         <!-- 本月待出糧卡片 -->
         <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl flex justify-between items-center">
@@ -165,24 +77,37 @@
           <span class="text-2xl">💵</span>
         </div>
 
+        <!-- 🎯 3 個主題題目選擇按鈕列 -->
+        <div class="bg-white p-2 rounded-xl border border-slate-200 grid grid-cols-3 gap-1 text-center text-[11px] font-bold">
+          <button id="cat-btn-env" onclick="selectQuestionCategory('商業環境', this)" class="cat-tab-btn py-2 rounded-lg bg-indigo-600 text-white transition shadow-sm">
+            🏢 商業環境
+          </button>
+          <button id="cat-btn-fin" onclick="selectQuestionCategory('個人理財基礎', this)" class="cat-tab-btn py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+            💳 個人理財基礎
+          </button>
+          <button id="cat-btn-acc" onclick="selectQuestionCategory('基礎會計', this)" class="cat-tab-btn py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+            📖 基礎會計
+          </button>
+        </div>
+
         <!-- DSE BAFS 選擇題挑戰卡片 -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
           <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-            <span id="question-category" class="bg-indigo-100 text-indigo-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">DSE BAFS 卷一</span>
-            <span class="text-xs text-amber-600 font-bold">獎酬：+$<span id="question-reward-display">1,000</span> (待出糧)</span>
+            <span id="question-category" class="bg-indigo-100 text-indigo-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">商業環境</span>
+            <span class="text-xs text-amber-600 font-bold">獎酬：+$1,000 (待出糧)</span>
           </div>
 
-          <!-- 題目 -->
-          <p id="question-text" class="text-sm font-semibold text-slate-800 leading-relaxed">載入雲端題目中...</p>
+          <!-- 不顯示題號，直接顯示問題 -->
+          <p id="question-text" class="text-sm font-semibold text-slate-800 leading-relaxed">載入題目中...</p>
 
           <!-- 4 個動態洗牌選項按鈕 (A, B, C, D) -->
           <div id="options-container" class="space-y-2 pt-1">
-            <!-- 由 JS 動態生成 -->
+            <!-- 由 JS 動態洗牌後生成選項 -->
           </div>
 
           <p id="answer-feedback" class="text-xs mt-2 p-2.5 rounded-lg hidden"></p>
 
-          <button id="btn-next-question" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded-lg text-xs transition mt-2 hidden">下一題 (隨機抽題與洗牌) ➔</button>
+          <button id="btn-next-question" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded-lg text-xs transition mt-2 hidden">同主題下一題 ➔</button>
         </div>
       </div>
 
@@ -376,7 +301,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, collection, addDoc, onSnapshot, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, collection, addDoc, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // 🔴 請將下方的 Firebase 金鑰替換為你的專屬資料 🔴
     const firebaseConfig = {
@@ -415,137 +340,6 @@
     let currentUserData = {};
     let unsubscribeUserDoc = null;
     let unsubscribeLedger = null;
-    let unsubscribeQuestions = null;
-
-    // 預設 10 題 DSE BAFS 題庫 (用於初始資料庫寫入)
-    const defaultSeedQuestions = [
-      {
-        category: "DSE BAFS 卷一：會計導論",
-        question: "根據「業務個體概念」（Business Entity Concept），東主從獨資企業抽取現金作私人用途，會計上應記為以下哪項？",
-        options: [
-          { text: "提款 (Drawings)", isCorrect: true },
-          { text: "營業費用 (Expenses)", isCorrect: false },
-          { text: "資本 (Capital)", isCorrect: false },
-          { text: "非流動負債 (Non-current Liabilities)", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "業務個體概念規定企業與東主的財務必須分開處理，東主提取資金應列為『提款』以減少所有者權益。"
-      },
-      {
-        category: "DSE BAFS 卷一：管理基礎",
-        question: "經理正在評估員工的表現，並將實際業績與預設目標進行比較及修正差距。這屬於哪項基本管理功能？",
-        options: [
-          { text: "控制 (Controlling)", isCorrect: true },
-          { text: "計劃 (Planning)", isCorrect: false },
-          { text: "組織 (Organising)", isCorrect: false },
-          { text: "領導 (Leading)", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "控制（Controlling）是指設定標準、監察活動、比較實際績效與目標並作出糾正行動的過程。"
-      },
-      {
-        category: "DSE BAFS 卷一：商業環境",
-        question: "下列哪種香港企業組織形式中，業主需要對企業的所有債務承擔「無限法律責任」？",
-        options: [
-          { text: "獨資企業", isCorrect: true },
-          { text: "私人有限公司", isCorrect: false },
-          { text: "公眾有限公司", isCorrect: false },
-          { text: "股份有限公司", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "獨資企業的東主與企業在法律上為同一主體，東主需承擔無限法律責任。"
-      },
-      {
-        category: "DSE BAFS 卷一：個人理財",
-        question: "若一名月薪為 $16,000 的香港僱員，根據 MPF 法例，其每月『僱員強制性供款』金額應為多少？",
-        options: [
-          { text: "$800", isCorrect: true },
-          { text: "$0", isCorrect: false },
-          { text: "$500", isCorrect: false },
-          { text: "$1,500", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "月薪介乎 $7,100 至 $30,000 時，僱員強制性供款比率為 5%。$16,000 × 5% = $800。"
-      },
-      {
-        category: "DSE BAFS 卷一：會計導論",
-        question: "基本會計等式（Accounting Equation）的標準表達方式是：",
-        options: [
-          { text: "資產 = 負債 + 所有者權益", isCorrect: true },
-          { text: "資產 + 負債 = 所有者權益", isCorrect: false },
-          { text: "負債 = 資產 + 所有者權益", isCorrect: false },
-          { text: "所有者權益 = 收入 - 費用", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "基本會計等式為：資產 (Assets) = 負債 (Liabilities) + 所有者權益 (Capital)。"
-      },
-      {
-        category: "DSE BAFS 卷一：商業環境",
-        question: "根據香港《公司條例》，私人有限公司的股東人數上限是多少人？",
-        options: [
-          { text: "50 人", isCorrect: true },
-          { text: "20 人", isCorrect: false },
-          { text: "100 人", isCorrect: false },
-          { text: "沒有上限", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "香港私人有限公司的股東人數上限為 50 人，且股份不能向公眾公開發售。"
-      },
-      {
-        category: "DSE BAFS 卷一：會計導論",
-        question: "「歷史成本概念」（Historical Cost Concept）是指資產應以什麼價值在財務報表中記錄？",
-        options: [
-          { text: "購買時的實際取得成本", isCorrect: true },
-          { text: "現時的市場重置價值", isCorrect: false },
-          { text: "預期的未來賣出價格", isCorrect: false },
-          { text: "扣除清算費用後的淨值", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "歷史成本概念規定資產應以交易發生時的實際購置成本入賬，不受後續市場價格波動影響。"
-      },
-      {
-        category: "DSE BAFS 卷一：管理基礎",
-        question: "在 SWOT 分析中，企業內部的優勢與劣勢（S & W）主要源自於哪裡？",
-        options: [
-          { text: "企業內部的資源與能力", isCorrect: true },
-          { text: "宏觀經濟與政府政策", isCorrect: false },
-          { text: "行業競爭對手的戰略動作", isCorrect: false },
-          { text: "全球供應鏈與國際貿易環境", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "SWOT 中，Strengths (優勢) 與 Weaknesses (劣勢) 屬於內部環境分析；Opportunities (機會) 與 Threats (威脅) 屬於外部環境分析。"
-      },
-      {
-        category: "DSE BAFS 卷一：個人理財",
-        question: "風險與回報成正比關係。下列哪項投資工具在正常情況下風險最高但潛在回報亦最高？",
-        options: [
-          { text: "普通股票 (Equities)", isCorrect: true },
-          { text: "銀行定期存款 (Time Deposit)", isCorrect: false },
-          { text: "政府外匯基金債券 (Bonds)", isCorrect: false },
-          { text: "儲蓄戶口存款", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "股票的價格波動較大，風險較債券與定期存款高，但長期潛在資本升值回報亦相對最高。"
-      },
-      {
-        category: "DSE BAFS 卷一：會計導論",
-        question: "下列哪項屬於企業的「流動資產」(Current Asset)？",
-        options: [
-          { text: "應收賬款 (Trade Debtors / Accounts Receivable)", isCorrect: true },
-          { text: "辦公室物業 (Premises)", isCorrect: false },
-          { text: "機器與設備 (Machinery)", isCorrect: false },
-          { text: "應付賬款 (Trade Creditors / Accounts Payable)", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "應收賬款預計會在一年（或一個營業週期）內變現，故屬於流動資產。"
-      }
-    ];
-
-    // 全局問題列表數據
-    let loadedQuestions = [];
-    let currentQuestion = null;
-    let currentShuffledOptions = [];
-    let isAnsweredCurrent = false;
 
     // 基礎股票基準價
     const baseStocks = [
@@ -693,7 +487,178 @@
       });
     }
 
-    // 🎲 陣列隨機洗牌演算法
+    // ================= 📚 DSE BAFS 分科題庫 (3 大部分) =================
+    const bafsQuestions = [
+      // --- 1. 商業環境 ---
+      {
+        id: 101,
+        category: "商業環境",
+        question: "經理正在評估員工的表現，並將實際業績與預設目標進行比較及修正差距。這屬於哪項基本管理功能？",
+        options: [
+          { text: "控制 (Controlling)", isCorrect: true },
+          { text: "計劃 (Planning)", isCorrect: false },
+          { text: "組織 (Organising)", isCorrect: false },
+          { text: "領導 (Leading)", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "控制（Controlling）是指設定標準、監察活動、比較實際績效與目標並作出糾正行動的過程。"
+      },
+      {
+        id: 102,
+        category: "商業環境",
+        question: "下列哪種香港企業組織形式中，業主需要對企業的所有債務承擔「無限法律責任」？",
+        options: [
+          { text: "獨資企業", isCorrect: true },
+          { text: "私人有限公司", isCorrect: false },
+          { text: "公眾有限公司", isCorrect: false },
+          { text: "股份有限公司", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "獨資企業的東主與企業在法律上為同一主體，東主需承擔無限法律責任。"
+      },
+      {
+        id: 103,
+        category: "商業環境",
+        question: "根據香港《公司條例》，私人有限公司的股東人數上限是多少人？",
+        options: [
+          { text: "50 人", isCorrect: true },
+          { text: "20 人", isCorrect: false },
+          { text: "100 人", isCorrect: false },
+          { text: "沒有上限", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "香港私人有限公司的股東人數上限為 50 人，且股份不能向公眾公開發售。"
+      },
+      {
+        id: 104,
+        category: "商業環境",
+        question: "在 SWOT 分析中，企業內部的優勢與劣勢（S & W）主要源自於哪裡？",
+        options: [
+          { text: "企業內部的資源與能力", isCorrect: true },
+          { text: "宏觀經濟與政府政策", isCorrect: false },
+          { text: "行業競爭對手的戰略動作", isCorrect: false },
+          { text: "全球供應鏈與國際貿易環境", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "SWOT 中，Strengths (優勢) 與 Weaknesses (劣勢) 屬於內部環境分析。"
+      },
+
+      // --- 2. 個人理財基礎 ---
+      {
+        id: 201,
+        category: "個人理財基礎",
+        question: "若一名月薪為 $16,000 的香港僱員，根據 MPF 法例，其每月「僱員強制性供款」金額應為多少？",
+        options: [
+          { text: "$800", isCorrect: true },
+          { text: "$0", isCorrect: false },
+          { text: "$500", isCorrect: false },
+          { text: "$1,500", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "月薪介乎 $7,100 至 $30,000 時，僱員強制性供款比率為 5%。$16,000 × 5% = $800。"
+      },
+      {
+        id: 202,
+        category: "個人理財基礎",
+        question: "風險與回報成正比關係。下列哪項投資工具在正常情況下風險最高但潛在回報亦最高？",
+        options: [
+          { text: "普通股票 (Equities)", isCorrect: true },
+          { text: "銀行定期存款 (Time Deposit)", isCorrect: false },
+          { text: "政府外匯基金債券 (Bonds)", isCorrect: false },
+          { text: "儲蓄戶口存款", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "股票的價格波動較大，風險較債券與定期存款高，但長期潛在資本升值回報亦相對最高。"
+      },
+      {
+        id: 203,
+        category: "個人理財基礎",
+        question: "個人制定「財務預算」(Budgeting) 的最主要目的是什麼？",
+        options: [
+          { text: "控制個人日常開支並實現長期財務目標", isCorrect: true },
+          { text: "向銀行申請更高額度的信用卡", isCorrect: false },
+          { text: "完全停止任何非必要娛樂消費", isCorrect: false },
+          { text: "計算應向政府繳納的個人薪俸稅", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "財務預算能協助個人規劃收入與支出，避免過度消費並預留儲蓄以實現財務目標。"
+      },
+      {
+        id: 204,
+        category: "個人理財基礎",
+        question: "什麼是「複利效應」(Compound Interest)？",
+        options: [
+          { text: "將每期產生的利息加入本金，隨時間推移滾存產生更多利息", isCorrect: true },
+          { text: "銀行每年給予固定不變的定額利息金額", isCorrect: false },
+          { text: "借款人因逾期還款而被收取的雙倍罰息", isCorrect: false },
+          { text: "政府對投資資本收益所徵收的累進稅率", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "複利即『利滾利』，將獲得的利息再投入本金中繼續計算利息，時間越長財富增長速度越快。"
+      },
+
+      // --- 3. 基礎會計 ---
+      {
+        id: 301,
+        category: "基礎會計",
+        question: "根據「業務個體概念」（Business Entity Concept），東主從獨資企業抽取現金作私人用途，會計上應記為以下哪項？",
+        options: [
+          { text: "提款 (Drawings)", isCorrect: true },
+          { text: "營業費用 (Expenses)", isCorrect: false },
+          { text: "資本 (Capital)", isCorrect: false },
+          { text: "非流動負債 (Non-current Liabilities)", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "業務個體概念規定企業與東主的財務必須分開處理，東主提取資金應列為『提款』以減少所有者權益。"
+      },
+      {
+        id: 302,
+        category: "基礎會計",
+        question: "基本會計等式（Accounting Equation）的標準表達方式是：",
+        options: [
+          { text: "資產 = 負債 + 所有者權益", isCorrect: true },
+          { text: "資產 + 負債 = 所有者權益", isCorrect: false },
+          { text: "負債 = 資產 + 所有者權益", isCorrect: false },
+          { text: "所有者權益 = 收入 - 費用", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "基本會計等式為：資產 (Assets) = 負債 (Liabilities) + 所有者權益 (Capital)。"
+      },
+      {
+        id: 303,
+        category: "基礎會計",
+        question: "「歷史成本概念」（Historical Cost Concept）是指資產應以什麼價值在財務報表中記錄？",
+        options: [
+          { text: "購買時的實際取得成本", isCorrect: true },
+          { text: "現時的市場重置價值", isCorrect: false },
+          { text: "預期的未來賣出價格", isCorrect: false },
+          { text: "扣除清算費用後的淨值", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "歷史成本概念規定資產應以交易發生時的實際購置成本入賬，不受後續市場價格波動影響。"
+      },
+      {
+        id: 304,
+        category: "基礎會計",
+        question: "下列哪項屬於企業的「流動資產」(Current Asset)？",
+        options: [
+          { text: "應收賬款 (Trade Debtors / Accounts Receivable)", isCorrect: true },
+          { text: "辦公室物業 (Premises)", isCorrect: false },
+          { text: "機器與設備 (Machinery)", isCorrect: false },
+          { text: "應付賬款 (Trade Creditors / Accounts Payable)", isCorrect: false }
+        ],
+        reward: 1000,
+        explanation: "應收賬款預計會在一年（或一個營業週期）內變現，故屬於流動資產。"
+      }
+    ];
+
+    let currentSelectedCategory = "商業環境";
+    let filteredQuestions = [];
+    let currentQuestionIndexInFiltered = 0;
+    let currentShuffledOptions = [];
+    let isAnsweredCurrent = false;
+
+    // 🎲 Fisher-Yates 陣列隨機洗牌演算法
     function shuffleArray(array) {
       const arr = [...array];
       for (let i = arr.length - 1; i > 0; i--) {
@@ -703,52 +668,36 @@
       return arr;
     }
 
-    // 📚 從 Firebase 實時載入雲端題庫
-    function listenToQuestions() {
-      const qRef = collection(db, 'questions');
-      unsubscribeQuestions = onSnapshot(qRef, async (snapshot) => {
-        // 如果資料庫沒題目，自動初始化寫入預設 10 題
-        if (snapshot.empty) {
-          console.log("資料庫無題目，寫入預設題庫...");
-          for (const item of defaultSeedQuestions) {
-            await addDoc(collection(db, 'questions'), {
-              ...item,
-              created_at: new Date()
-            });
-          }
-          return;
-        }
+    // 選擇題目分類
+    window.selectQuestionCategory = function(cat, btnElement) {
+      currentSelectedCategory = cat;
 
-        loadedQuestions = [];
-        snapshot.forEach(docSnap => {
-          loadedQuestions.push({
-            docId: docSnap.id,
-            ...docSnap.data()
-          });
-        });
-
-        document.getElementById('question-count-tag').textContent = `${loadedQuestions.length} 題`;
-
-        // 渲染題目與老師後台題庫列表
-        if (!currentQuestion) renderBAFSQuestion();
-        renderAdminQuestionsList();
+      // 更新按鈕樣式
+      document.querySelectorAll('.cat-tab-btn').forEach(btn => {
+        btn.className = "cat-tab-btn py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
       });
+      btnElement.className = "cat-tab-btn py-2 rounded-lg bg-indigo-600 text-white transition shadow-sm";
+
+      loadQuestionForSelectedCategory();
+    };
+
+    function loadQuestionForSelectedCategory() {
+      filteredQuestions = bafsQuestions.filter(q => q.category === currentSelectedCategory);
+      if (filteredQuestions.length === 0) return;
+
+      currentQuestionIndexInFiltered = Math.floor(Math.random() * filteredQuestions.length);
+      renderBAFSQuestion();
     }
 
-    // 渲染 BAFS 學生答題介面
+    // 渲染 BAFS 題目
     function renderBAFSQuestion() {
-      if (loadedQuestions.length === 0) {
-        document.getElementById('question-text').textContent = "目前雲端題庫尚無題目，請聯絡老師新增！";
-        return;
+      if (filteredQuestions.length === 0) {
+        filteredQuestions = bafsQuestions.filter(q => q.category === currentSelectedCategory);
       }
 
-      // 隨機抽一題
-      const randomIndex = Math.floor(Math.random() * loadedQuestions.length);
-      currentQuestion = loadedQuestions[randomIndex];
-
-      document.getElementById('question-category').textContent = currentQuestion.category || "DSE BAFS 卷一";
-      document.getElementById('question-reward-display').textContent = (currentQuestion.reward || 1000).toLocaleString();
-      document.getElementById('question-text').textContent = currentQuestion.question;
+      const q = filteredQuestions[currentQuestionIndexInFiltered];
+      document.getElementById('question-category').textContent = `DSE BAFS 卷一：${q.category}`;
+      document.getElementById('question-text').textContent = q.question;
 
       const optionsContainer = document.getElementById('options-container');
       optionsContainer.innerHTML = '';
@@ -758,7 +707,7 @@
       document.getElementById('btn-next-question').classList.add('hidden');
       isAnsweredCurrent = false;
 
-      currentShuffledOptions = shuffleArray(currentQuestion.options || []);
+      currentShuffledOptions = shuffleArray(q.options);
       const labels = ['A', 'B', 'C', 'D'];
 
       currentShuffledOptions.forEach((opt, index) => {
@@ -776,136 +725,45 @@
       if (isAnsweredCurrent) return;
       isAnsweredCurrent = true;
 
+      const q = filteredQuestions[currentQuestionIndexInFiltered];
       const selectedOption = currentShuffledOptions[shuffledIndex];
       const feedback = document.getElementById('answer-feedback');
       feedback.classList.remove('hidden');
 
-      const correctOption = currentQuestion.options.find(o => o.isCorrect);
-      const reward = currentQuestion.reward || 1000;
+      const correctOption = q.options.find(o => o.isCorrect);
 
       if (selectedOption.isCorrect) {
         feedback.className = "text-xs mt-2 p-2.5 rounded-lg bg-green-50 border border-green-200 text-green-700 font-bold";
-        feedback.innerHTML = `🎉 答對了！(你選擇了 ${clickedKey}: ${selectedOption.text})<br><span class="font-normal text-[11px] text-green-600">${currentQuestion.explanation || ''}</span><br><strong>+$${reward} 已記入本月待出糧金額！</strong>`;
+        feedback.innerHTML = `🎉 答對了！(你選擇了 ${clickedKey}: ${selectedOption.text})<br><span class="font-normal text-[11px] text-green-600">${q.explanation}</span><br><strong>+$${q.reward} 已記入本月待出糧金額！</strong>`;
         
         const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, { accrued_salary: increment(reward) });
+        await updateDoc(userRef, { accrued_salary: increment(q.reward) });
         await addDoc(collection(db, 'ledger'), {
           student_email: currentUser.email,
-          amount: reward,
-          reason: `答對 BAFS 題目 (${currentQuestion.category ? currentQuestion.category.split('：')[1] : '答題'})`,
+          amount: q.reward,
+          reason: `答對 BAFS 題目 (${q.category})`,
           created_at: new Date()
         });
       } else {
         feedback.className = "text-xs mt-2 p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700";
-        feedback.innerHTML = `❌ 答錯了！正確答案是：<strong>${correctOption ? correctOption.text : ''}</strong><br><span class="text-[11px]">${currentQuestion.explanation || ''}</span>`;
+        feedback.innerHTML = `❌ 答錯了！正確答案是：<strong>${correctOption.text}</strong><br><span class="text-[11px]">${q.explanation}</span>`;
       }
 
       document.getElementById('btn-next-question').classList.remove('hidden');
     }
 
-    // 下一題按鈕（隨機抽題）
+    // 下一題按鈕（同分類隨機抽題）
     document.getElementById('btn-next-question').addEventListener('click', () => {
+      if (filteredQuestions.length <= 1) {
+        renderBAFSQuestion();
+        return;
+      }
+      let nextIndex = Math.floor(Math.random() * filteredQuestions.length);
+      if (nextIndex === currentQuestionIndexInFiltered) {
+        nextIndex = (currentQuestionIndexInFiltered + 1) % filteredQuestions.length;
+      }
+      currentQuestionIndexInFiltered = nextIndex;
       renderBAFSQuestion();
-    });
-
-    // 切換管理子分頁
-    window.switchAdminTab = function(subtabId) {
-      document.querySelectorAll('.admin-subtab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById(subtabId).classList.remove('hidden');
-
-      document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-        btn.classList.remove('font-bold', 'text-amber-800', 'border-b-2', 'border-amber-700');
-        btn.classList.add('text-amber-600');
-      });
-
-      const activeBtn = document.getElementById(`btn-${subtabId}`);
-      if (activeBtn) {
-        activeBtn.classList.add('font-bold', 'text-amber-800', 'border-b-2', 'border-amber-700');
-      }
-    };
-
-    // 渲染老師後台題目列表
-    function renderAdminQuestionsList() {
-      const container = document.getElementById('admin-questions-list');
-      container.innerHTML = '';
-
-      if (loadedQuestions.length === 0) {
-        container.innerHTML = '<p class="text-slate-400 text-[10px] text-center py-2">目前尚無題目</p>';
-        return;
-      }
-
-      loadedQuestions.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = "p-2 bg-white rounded border border-amber-200 flex justify-between items-start gap-2 text-[11px]";
-        div.innerHTML = `
-          <div class="space-y-0.5">
-            <span class="text-[9px] bg-amber-100 text-amber-800 px-1 rounded font-bold">${item.category}</span>
-            <p class="font-semibold text-slate-800 line-clamp-1">${index + 1}. ${item.question}</p>
-            <p class="text-[9px] text-slate-400">獎酬: $${item.reward} | 選項數: ${item.options ? item.options.length : 0}</p>
-          </div>
-          <button onclick="deleteQuestionDoc('${item.docId}')" class="text-[10px] text-red-500 hover:text-red-700 bg-red-50 px-1.5 py-0.5 rounded font-bold whitespace-nowrap">刪除</button>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    // 刪除題目
-    window.deleteQuestionDoc = async function(docId) {
-      if (!confirm("確定要刪除此題目嗎？刪除後學生將不會再抽到。")) return;
-      try {
-        await deleteDoc(doc(db, 'questions', docId));
-        alert("題目已成功刪除！");
-      } catch (err) {
-        alert("刪除失敗：" + err.message);
-      }
-    };
-
-    // 老師新增新題目事件
-    document.getElementById('btn-add-question').addEventListener('click', async () => {
-      const category = document.getElementById('q-add-category').value;
-      const question = document.getElementById('q-add-text').value.trim();
-      const opt1 = document.getElementById('q-add-opt1').value.trim();
-      const opt2 = document.getElementById('q-add-opt2').value.trim();
-      const opt3 = document.getElementById('q-add-opt3').value.trim();
-      const opt4 = document.getElementById('q-add-opt4').value.trim();
-      const correctIdx = parseInt(document.getElementById('q-add-correct-index').value);
-      const reward = parseInt(document.getElementById('q-add-reward').value) || 1000;
-      const explanation = document.getElementById('q-add-explanation').value.trim();
-
-      if (!question || !opt1 || !opt2 || !opt3 || !opt4) {
-        alert("請完整輸入問題與全部 4 個選項！");
-        return;
-      }
-
-      const rawOpts = [opt1, opt2, opt3, opt4];
-      const optionsArray = rawOpts.map((text, idx) => ({
-        text: text,
-        isCorrect: (idx === correctIdx)
-      }));
-
-      try {
-        await addDoc(collection(db, 'questions'), {
-          category: category,
-          question: question,
-          options: optionsArray,
-          reward: reward,
-          explanation: explanation,
-          created_at: new Date()
-        });
-
-        alert("🎉 新題目已成功發布至雲端題庫！學生現在可以抽到此題。");
-
-        // 清空表單
-        document.getElementById('q-add-text').value = '';
-        document.getElementById('q-add-opt1').value = '';
-        document.getElementById('q-add-opt2').value = '';
-        document.getElementById('q-add-opt3').value = '';
-        document.getElementById('q-add-opt4').value = '';
-        document.getElementById('q-add-explanation').value = '';
-
-      } catch (err) {
-        alert("發布失敗：" + err.message);
-      }
     });
 
     // 切換分頁
@@ -921,7 +779,7 @@
       btnElement.classList.add('text-indigo-600', 'font-bold');
 
       if (tabId === 'tab-leaderboard') loadLeaderboard();
-      if (tabId === 'tab-questions') renderBAFSQuestion();
+      if (tabId === 'tab-questions') loadQuestionForSelectedCategory();
       if (tabId === 'tab-investment') renderStockMarketUI();
     }
 
@@ -950,10 +808,9 @@
 
         setupUserRealtime(user);
         loadLedger(user.email);
-        listenToQuestions();
+        loadQuestionForSelectedCategory();
         fetchRealHSI();
 
-        // 設定每 30 秒自動重新渲染投資頁面
         setInterval(() => {
           if (!document.getElementById('tab-investment').classList.contains('hidden')) {
             renderStockMarketUI();
@@ -964,7 +821,6 @@
         currentUser = null;
         if (unsubscribeUserDoc) unsubscribeUserDoc();
         if (unsubscribeLedger) unsubscribeLedger();
-        if (unsubscribeQuestions) unsubscribeQuestions();
         loginCard.classList.remove('hidden');
         mainDashboard.classList.add('hidden');
         bottomNav.classList.add('hidden');
