@@ -154,7 +154,7 @@
         <!-- 恒生指數 (HSI) 真實數據與港股交易時間狀態卡片 -->
         <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md border border-slate-800">
           <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
-            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">🇭🇰 恒生指數 (真實數據)</span>
+            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">🇭🇰 恒生指數 (真實大盤參考)</span>
             <span id="market-trading-status" class="text-[10px] px-2 py-0.5 rounded font-bold">檢查交易狀態中...</span>
           </div>
           <div class="flex justify-between items-baseline">
@@ -163,7 +163,7 @@
               <p id="hsi-change" class="text-xs font-semibold text-emerald-400">-10.76 (-0.04%)</p>
             </div>
             <div class="text-right">
-              <p class="text-[10px] text-slate-400">交易時間 (HKT)</p>
+              <p class="text-[10px] text-amber-400 font-semibold">⚡ 每 30 分鐘股價波動</p>
               <p class="text-[10px] text-slate-300 font-mono">09:30-12:00 | 13:00-16:00</p>
             </div>
           </div>
@@ -226,7 +226,10 @@
         <!-- 🏬 模擬港股大盤市場列表與 Pull-down Menu 篩選列 -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
           <div class="flex flex-col gap-2">
-            <h3 class="font-bold text-slate-700 text-xs">🏬 香港模擬股票市場 (10 隻指標股)</h3>
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-slate-700 text-xs">🏬 香港模擬股票市場 (10 隻指標股)</h3>
+              <span id="slot-time-tag" class="text-[10px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">時段：即時動態</span>
+            </div>
             
             <div class="grid grid-cols-2 gap-2">
               <select id="sector-filter" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-slate-50 font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
@@ -398,6 +401,39 @@
       return isMorningSession || isAfternoonSession;
     }
 
+    // ⚡ 計算每日交易時間內每 30 分鐘的波動 (全班同步 Seed 演算法)
+    function getHalfHourNoise(stockCode) {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const hkTime = new Date(utc + (3600000 * 8));
+
+      const day = hkTime.getDay();
+      if (day === 0 || day === 6) return 0; // 週末無波動
+
+      const hours = hkTime.getHours();
+      const minutes = hkTime.getMinutes();
+      const timeVal = hours * 100 + minutes;
+
+      const isMorning = (timeVal >= 930 && timeVal < 1200);
+      const isAfternoon = (timeVal >= 1300 && timeVal < 1600);
+
+      // 非交易時間，保持 0 額外波動
+      if (!isMorning && !isAfternoon) return 0;
+
+      const slotMin = minutes < 30 ? "00" : "30";
+      const dateStr = `${hkTime.getFullYear()}-${hkTime.getMonth() + 1}-${hkTime.getDate()}`;
+      const slotKey = `${dateStr}-${hours}:${slotMin}-${stockCode}`;
+
+      // 使用 Hash 演算法生成固定於該 30 分鐘內的升跌幅（-3.5% 至 +3.5%）
+      let hash = 0;
+      for (let i = 0; i < slotKey.length; i++) {
+        hash = ((hash << 5) - hash) + slotKey.charCodeAt(i);
+        hash |= 0;
+      }
+      const rawPct = ((Math.abs(hash) % 71) - 35) / 10; // -3.5 至 +3.5
+      return rawPct;
+    }
+
     async function fetchRealHSI() {
       try {
         const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/^HSI?interval=1d'));
@@ -420,13 +456,25 @@
     function getAdjustedStocks() {
       const activeEvent = getCurrentBiweeklyEvent();
       return baseStocks.map(stock => {
-        let price = stock.basePrice;
-        let changePct = 0;
+        let base = stock.basePrice;
+        let eventChangePct = 0;
+        
         if (stock.code === activeEvent.targetCode) {
-          price = Math.round(stock.basePrice * activeEvent.multiplier * 100) / 100;
-          changePct = Math.round((activeEvent.multiplier - 1) * 100);
+          base = stock.basePrice * activeEvent.multiplier;
+          eventChangePct = (activeEvent.multiplier - 1) * 100;
         }
-        return { ...stock, price, changePct };
+
+        // 疊加每半小時的獨立波幅
+        const halfHourPct = getHalfHourNoise(stock.code);
+        const finalPrice = Math.max(0.1, base * (1 + halfHourPct / 100));
+        const totalChangePct = Math.round((eventChangePct + halfHourPct) * 100) / 100;
+
+        return {
+          ...stock,
+          price: Math.round(finalPrice * 100) / 100,
+          changePct: totalChangePct,
+          halfHourPct: halfHourPct.toFixed(1)
+        };
       });
     }
 
@@ -582,8 +630,6 @@
     function renderBAFSQuestion() {
       const q = bafsQuestions[currentQuestionIndex];
       document.getElementById('question-category').textContent = q.category;
-      
-      // 💡 此處已移除題號標示，直接顯示題目內容
       document.getElementById('question-text').textContent = q.question;
 
       const optionsContainer = document.getElementById('options-container');
@@ -594,7 +640,6 @@
       document.getElementById('btn-next-question').classList.add('hidden');
       isAnsweredCurrent = false;
 
-      // 🔀 每次顯示題目時，將 4 個選項隨機打亂順序！
       currentShuffledOptions = shuffleArray(q.options);
       const labels = ['A', 'B', 'C', 'D'];
 
@@ -694,6 +739,14 @@
         loadLedger(user.email);
         renderBAFSQuestion();
         fetchRealHSI();
+
+        // 設定每 30 秒自動重新渲染投資頁面（用以檢測 30 分鐘時間波幅更新）
+        setInterval(() => {
+          if (!document.getElementById('tab-investment').classList.contains('hidden')) {
+            renderStockMarketUI();
+          }
+        }, 30000);
+
       } else {
         currentUser = null;
         if (unsubscribeUserDoc) unsubscribeUserDoc();
@@ -784,12 +837,18 @@
       const isOpen = checkHKMarketTradingHours();
       const statusBadge = document.getElementById('market-trading-status');
       if (isOpen) {
-        statusBadge.textContent = "🟢 開市交易中";
+        statusBadge.textContent = "🟢 開市交易中 (每30分鐘更新價格)";
         statusBadge.className = "text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold";
       } else {
         statusBadge.textContent = "🔴 休市中 (非港股交易時段)";
         statusBadge.className = "text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-bold";
       }
+
+      // 更新時段標籤
+      const now = new Date();
+      const hkHours = now.getHours().toString().padStart(2, '0');
+      const hkMins = now.getMinutes() < 30 ? "00" : "30";
+      document.getElementById('slot-time-tag').textContent = `時段：${hkHours}:${hkMins} 最新報價`;
 
       const activeEvent = getCurrentBiweeklyEvent();
       document.getElementById('event-title-display').textContent = activeEvent.title;
@@ -813,7 +872,7 @@
           div.innerHTML = `
             <div>
               <p class="font-bold text-slate-800">${stock.name} (${code})</p>
-              <p class="text-[10px] text-slate-500">持有: ${qty} 股 | 現價: $${stock.price}</p>
+              <p class="text-[10px] text-slate-500">持有: ${qty} 股 | 現價: $${stock.price.toFixed(2)}</p>
             </div>
             <div class="text-right">
               <p class="font-extrabold text-emerald-600">$${totalVal}</p>
@@ -854,6 +913,8 @@
         if (stock.sector === "地產建築") sectorBadgeClass = "bg-amber-100 text-amber-800";
         if (stock.sector === "工商業") sectorBadgeClass = "bg-purple-100 text-purple-700";
 
+        const halfHourTag = isOpen ? `<span class="text-[9px] text-slate-400 block">本半小時波幅: ${stock.halfHourPct >= 0 ? '+' : ''}${stock.halfHourPct}%</span>` : '';
+
         const div = document.createElement('div');
         div.className = "p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2";
         div.innerHTML = `
@@ -866,6 +927,7 @@
             <div class="text-right">
               <span class="font-extrabold text-sm text-slate-800">$${stock.price.toFixed(2)}</span>
               <span class="text-[11px] font-bold ${colorClass} block">${isUp ? '+' : ''}${stock.changePct}%</span>
+              ${halfHourTag}
             </div>
           </div>
           <p class="text-[10px] text-slate-400">每手規格：${stock.lotSize} 股</p>
