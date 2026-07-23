@@ -46,7 +46,7 @@
       </div>
 
       <!-- 👑 老師專屬管理面板 -->
-      <div id="admin-panel" class="bg-amber-50 border border-amber-200 p-4 rounded-xl hidden space-y-3">
+      <div id="admin-panel" class="bg-amber-50 border border-amber-200 p-4 rounded-xl hidden space-y-4">
         <h3 class="font-bold text-amber-800 text-xs flex items-center gap-1">👑 老師管理功能</h3>
         
         <!-- 手動加薪/扣薪 -->
@@ -58,11 +58,22 @@
           <button id="btn-admin-adjust" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-1.5 rounded text-xs transition">記錄本月薪金</button>
         </div>
 
-        <!-- 🗓️ 月結一鍵出糧 (香港 MPF 結算) -->
-        <div>
+        <!-- 🗓️ 月結一鍵出糧 -->
+        <div class="border-b border-amber-200 pb-3">
           <p class="text-[11px] font-semibold text-amber-700">🗓️ 月底出糧結算</p>
           <p class="text-[10px] text-amber-600 mb-1.5">將全班「待出糧金額」依香港 MPF 法例扣除供款後發放至活期戶口。</p>
           <button id="btn-admin-mpf-payroll" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded text-xs transition shadow-sm">執行全班月底 MPF 出糧結算</button>
+        </div>
+
+        <!-- 📝 題目庫管理 (新增 / 編輯 / 刪除) -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <p class="text-[11px] font-semibold text-amber-700">📝 題目庫管理 (新增 / 編輯 / 刪除)</p>
+            <button id="btn-open-add-q" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-2 py-1 rounded text-[10px] transition">➕ 新增題目</button>
+          </div>
+          <div id="admin-questions-list" class="space-y-1.5 max-h-48 overflow-y-auto text-xs bg-white p-2 rounded border border-amber-200">
+            <p class="text-slate-400 text-center py-2">載入題目列表中...</p>
+          </div>
         </div>
       </div>
 
@@ -94,10 +105,10 @@
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
           <div class="flex justify-between items-center border-b border-slate-100 pb-2">
             <span id="question-category" class="bg-indigo-100 text-indigo-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">商業環境</span>
-            <span class="text-xs text-amber-600 font-bold">獎酬：+$1,000 (待出糧)</span>
+            <span id="question-reward-tag" class="text-xs text-amber-600 font-bold">獎酬：+$1,000 (待出糧)</span>
           </div>
 
-          <!-- 不顯示題號，直接顯示問題 -->
+          <!-- 直接顯示問題內容 -->
           <p id="question-text" class="text-sm font-semibold text-slate-800 leading-relaxed">載入題目中...</p>
 
           <!-- 4 個動態洗牌選項按鈕 (A, B, C, D) -->
@@ -124,26 +135,21 @@
 
       <!-- ================= 頁面 3：我的財富與紀錄 ================= -->
       <div id="tab-wallet" class="tab-content space-y-4 hidden">
-        <!-- 財富三部分總覽 -->
         <div class="grid grid-cols-3 gap-2">
-          <!-- 1. 活期戶口 -->
           <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
             <p class="text-[10px] text-slate-400 font-semibold">💳 活期戶口</p>
             <p class="text-base font-extrabold text-indigo-600 mt-1">$<span id="current-account-amount">0</span></p>
           </div>
-          <!-- 2. 投資戶口總額 -->
           <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
             <p class="text-[10px] text-slate-400 font-semibold">📈 投資總資產</p>
             <p class="text-base font-extrabold text-emerald-600 mt-1">$<span id="investment-account-amount">0</span></p>
           </div>
-          <!-- 3. 強積金戶口 -->
           <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
             <p class="text-[10px] text-slate-400 font-semibold">🛡️ MPF強積金</p>
             <p class="text-base font-extrabold text-amber-600 mt-1">$<span id="mpf-account-amount">0</span></p>
           </div>
         </div>
 
-        <!-- 本月待出糧提示卡片 -->
         <div class="bg-slate-800 text-white p-4 rounded-xl text-xs flex justify-between items-center shadow-sm">
           <div>
             <p class="text-slate-400">⏳ 本月累積發放（待月底出糧）</p>
@@ -152,7 +158,6 @@
           <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">月底自動結算</span>
         </div>
 
-        <!-- 歷史紀錄 -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
           <h3 class="font-bold text-slate-700 mb-3 text-sm">📜 出糧與交易紀錄</h3>
           <ul id="ledger-list" class="space-y-2 text-xs text-slate-600">
@@ -182,11 +187,11 @@
           </div>
         </div>
 
-        <!-- 📰 本雙週自動重大新聞公告 -->
+        <!-- 📰 每日焦點市場新聞 (每日 16:00 收市更新) -->
         <div class="bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-950 text-white p-4 rounded-2xl shadow-md space-y-2 border border-indigo-700">
           <div class="flex justify-between items-center border-b border-indigo-700/60 pb-2">
-            <span class="text-xs font-extrabold text-amber-300 flex items-center gap-1">📢 本雙週焦點市場新聞（系統自動觸發）</span>
-            <span class="text-[10px] bg-indigo-800 text-indigo-200 px-2 py-0.5 rounded font-semibold">每 14 天自動更替</span>
+            <span class="text-xs font-extrabold text-amber-300 flex items-center gap-1">📢 每日焦點市場新聞（每日 16:00 收市更新）</span>
+            <span class="text-[10px] bg-indigo-800 text-indigo-200 px-2 py-0.5 rounded font-semibold">每日 16:00 自動更替</span>
           </div>
           
           <h4 id="event-title-display" class="font-extrabold text-sm text-white pt-1">載入新聞中...</h4>
@@ -196,7 +201,7 @@
           </div>
         </div>
 
-        <!-- 資產總覽卡片 (投資現金 + 股票市值) -->
+        <!-- 資產總覽卡片 -->
         <div class="bg-gradient-to-br from-emerald-600 to-teal-800 text-white p-4 rounded-2xl shadow-md space-y-2">
           <div class="flex justify-between items-center">
             <span class="text-xs opacity-80">投資總資產</span>
@@ -214,7 +219,7 @@
           </div>
         </div>
 
-        <!-- 活期 ⇄ 投資現金 資金調撥 -->
+        <!-- 資金調撥 -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-2">
           <h3 class="font-bold text-slate-700 text-xs">💳 活期戶口與投資現金調撥</h3>
           <div class="flex gap-2">
@@ -225,7 +230,7 @@
           <p id="invest-feedback" class="text-[11px] hidden"></p>
         </div>
 
-        <!-- 我的股票持倉列表 -->
+        <!-- 我的股票持倉 -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-2">
           <h3 class="font-bold text-slate-700 text-xs flex items-center justify-between">
             <span>💼 我的股票持倉</span>
@@ -236,7 +241,7 @@
           </div>
         </div>
 
-        <!-- 🏬 模擬港股大盤市場列表與 Pull-down Menu 篩選列 -->
+        <!-- 🏬 模擬港股大盤市場 -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
           <div class="flex flex-col gap-2">
             <div class="flex justify-between items-center">
@@ -257,7 +262,7 @@
           </div>
 
           <div id="stock-market-list" class="space-y-2">
-            <!-- 由 JS 動態生成 10 隻股票列表 -->
+            <!-- 由 JS 動態生成 -->
           </div>
         </div>
 
@@ -266,7 +271,7 @@
     </div>
   </div>
 
-  <!-- 📱 底部 4 按鈕導覽列 (登入後顯示) -->
+  <!-- 📱 底部 4 按鈕導覽列 -->
   <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 max-w-md mx-auto flex justify-around py-2 z-40 hidden">
     <button onclick="switchTab('tab-questions', this)" class="nav-btn flex flex-col items-center text-indigo-600 font-bold text-[11px]">
       <span class="text-base">🎯</span>
@@ -286,7 +291,7 @@
     </button>
   </nav>
 
-  <!-- 👋 首次登入設定姓名彈出視窗 (Modal) -->
+  <!-- 👋 首次登入設定姓名 Modal -->
   <div id="name-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white p-6 rounded-2xl shadow-xl max-w-xs w-full space-y-4 text-center">
       <div class="text-3xl">👋</div>
@@ -297,11 +302,57 @@
     </div>
   </div>
 
+  <!-- 📝 題目編輯/新增 Modal (老師管理專用) -->
+  <div id="q-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white p-5 rounded-2xl shadow-xl max-w-sm w-full space-y-3 text-left max-h-[90vh] overflow-y-auto">
+      <h3 id="q-modal-title" class="font-extrabold text-slate-800 text-base">➕ 新增題目</h3>
+      
+      <input type="hidden" id="editing-q-id">
+
+      <div>
+        <label class="block text-[11px] font-bold text-slate-600 mb-1">題目分類</label>
+        <select id="q-input-category" class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs bg-white">
+          <option value="商業環境">🏢 商業環境</option>
+          <option value="個人理財基礎">💳 個人理財基礎</option>
+          <option value="基礎會計">📖 基礎會計</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-bold text-slate-600 mb-1">題目內容</label>
+        <textarea id="q-input-text" rows="2" placeholder="請輸入問題內容..." class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="block text-[11px] font-bold text-slate-600">選項設定 (第 1 項固定為正確答案)</label>
+        <input type="text" id="q-input-opt1" placeholder="✅ 正確答案" class="w-full px-3 py-1.5 border border-green-300 bg-green-50/50 rounded text-xs outline-none">
+        <input type="text" id="q-input-opt2" placeholder="❌ 錯誤答案 1" class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs outline-none">
+        <input type="text" id="q-input-opt3" placeholder="❌ 錯誤答案 2" class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs outline-none">
+        <input type="text" id="q-input-opt4" placeholder="❌ 錯誤答案 3" class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs outline-none">
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-bold text-slate-600 mb-1">答案解析 (Explanation)</label>
+        <input type="text" id="q-input-exp" placeholder="解答說明..." class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs outline-none">
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-bold text-slate-600 mb-1">答對獎酬金額 ($)</label>
+        <input type="number" id="q-input-reward" value="1000" class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs outline-none">
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button id="btn-cancel-q" class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-lg text-xs transition">取消</button>
+        <button id="btn-save-q" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-xs transition">儲存題目</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase JavaScript SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, collection, addDoc, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, increment, collection, addDoc, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // 🔴 請將下方的 Firebase 金鑰替換為你的專屬資料 🔴
     const firebaseConfig = {
@@ -340,6 +391,7 @@
     let currentUserData = {};
     let unsubscribeUserDoc = null;
     let unsubscribeLedger = null;
+    let unsubscribeQuestions = null;
 
     // 基礎股票基準價
     const baseStocks = [
@@ -355,8 +407,8 @@
       { code: "3690", name: "美團 (Meituan)", sector: "工商業", basePrice: 115.00, lotSize: 100 }
     ];
 
-    // 📰 雙週自動輪替新聞事件庫
-    const biweeklyEvents = [
+    // 📰 每日焦點新聞事件庫 (每日 16:00 收市時自動切換)
+    const dailyEvents = [
       {
         title: "騰訊發布全新 AI 晶片突破，國際機構大舉加碼",
         targetCode: "0700",
@@ -389,13 +441,23 @@
       }
     ];
 
-    function getCurrentBiweeklyEvent() {
-      const epoch = new Date("2026-01-01").getTime();
-      const now = Date.now();
-      const diffDays = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
-      const cycleIndex = Math.floor(diffDays / 14);
-      const eventIndex = Math.abs(cycleIndex) % biweeklyEvents.length;
-      return biweeklyEvents[eventIndex];
+    // 每日 16:00 (收市時間) 自動更替新聞計算
+    function getCurrentDailyEvent() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const hkTime = new Date(utc + (3600000 * 8));
+
+      // 偏移 16 小時，讓每日 16:00 收市作為日期的推進基準
+      const shiftedTime = new Date(hkTime.getTime() - 16 * 3600 * 1000);
+      const dateStr = `${shiftedTime.getFullYear()}-${shiftedTime.getMonth() + 1}-${shiftedTime.getDate()}`;
+
+      let hash = 0;
+      for (let i = 0; i < dateStr.length; i++) {
+        hash = ((hash << 5) - hash) + dateStr.charCodeAt(i);
+        hash |= 0;
+      }
+      const eventIndex = Math.abs(hash) % dailyEvents.length;
+      return dailyEvents[eventIndex];
     }
 
     function checkHKMarketTradingHours() {
@@ -464,7 +526,7 @@
     }
 
     function getAdjustedStocks() {
-      const activeEvent = getCurrentBiweeklyEvent();
+      const activeEvent = getCurrentDailyEvent();
       return baseStocks.map(stock => {
         let base = stock.basePrice;
         let eventChangePct = 0;
@@ -487,11 +549,9 @@
       });
     }
 
-    // ================= 📚 DSE BAFS 分科題庫 (3 大部分) =================
-    const bafsQuestions = [
-      // --- 1. 商業環境 ---
+    // ================= 📚 DSE BAFS 動態題庫 (來自 Firestore) =================
+    const defaultQuestions = [
       {
-        id: 101,
         category: "商業環境",
         question: "經理正在評估員工的表現，並將實際業績與預設目標進行比較及修正差距。這屬於哪項基本管理功能？",
         options: [
@@ -504,7 +564,6 @@
         explanation: "控制（Controlling）是指設定標準、監察活動、比較實際績效與目標並作出糾正行動的過程。"
       },
       {
-        id: 102,
         category: "商業環境",
         question: "下列哪種香港企業組織形式中，業主需要對企業的所有債務承擔「無限法律責任」？",
         options: [
@@ -517,35 +576,6 @@
         explanation: "獨資企業的東主與企業在法律上為同一主體，東主需承擔無限法律責任。"
       },
       {
-        id: 103,
-        category: "商業環境",
-        question: "根據香港《公司條例》，私人有限公司的股東人數上限是多少人？",
-        options: [
-          { text: "50 人", isCorrect: true },
-          { text: "20 人", isCorrect: false },
-          { text: "100 人", isCorrect: false },
-          { text: "沒有上限", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "香港私人有限公司的股東人數上限為 50 人，且股份不能向公眾公開發售。"
-      },
-      {
-        id: 104,
-        category: "商業環境",
-        question: "在 SWOT 分析中，企業內部的優勢與劣勢（S & W）主要源自於哪裡？",
-        options: [
-          { text: "企業內部的資源與能力", isCorrect: true },
-          { text: "宏觀經濟與政府政策", isCorrect: false },
-          { text: "行業競爭對手的戰略動作", isCorrect: false },
-          { text: "全球供應鏈與國際貿易環境", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "SWOT 中，Strengths (優勢) 與 Weaknesses (劣勢) 屬於內部環境分析。"
-      },
-
-      // --- 2. 個人理財基礎 ---
-      {
-        id: 201,
         category: "個人理財基礎",
         question: "若一名月薪為 $16,000 的香港僱員，根據 MPF 法例，其每月「僱員強制性供款」金額應為多少？",
         options: [
@@ -558,48 +588,6 @@
         explanation: "月薪介乎 $7,100 至 $30,000 時，僱員強制性供款比率為 5%。$16,000 × 5% = $800。"
       },
       {
-        id: 202,
-        category: "個人理財基礎",
-        question: "風險與回報成正比關係。下列哪項投資工具在正常情況下風險最高但潛在回報亦最高？",
-        options: [
-          { text: "普通股票 (Equities)", isCorrect: true },
-          { text: "銀行定期存款 (Time Deposit)", isCorrect: false },
-          { text: "政府外匯基金債券 (Bonds)", isCorrect: false },
-          { text: "儲蓄戶口存款", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "股票的價格波動較大，風險較債券與定期存款高，但長期潛在資本升值回報亦相對最高。"
-      },
-      {
-        id: 203,
-        category: "個人理財基礎",
-        question: "個人制定「財務預算」(Budgeting) 的最主要目的是什麼？",
-        options: [
-          { text: "控制個人日常開支並實現長期財務目標", isCorrect: true },
-          { text: "向銀行申請更高額度的信用卡", isCorrect: false },
-          { text: "完全停止任何非必要娛樂消費", isCorrect: false },
-          { text: "計算應向政府繳納的個人薪俸稅", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "財務預算能協助個人規劃收入與支出，避免過度消費並預留儲蓄以實現財務目標。"
-      },
-      {
-        id: 204,
-        category: "個人理財基礎",
-        question: "什麼是「複利效應」(Compound Interest)？",
-        options: [
-          { text: "將每期產生的利息加入本金，隨時間推移滾存產生更多利息", isCorrect: true },
-          { text: "銀行每年給予固定不變的定額利息金額", isCorrect: false },
-          { text: "借款人因逾期還款而被收取的雙倍罰息", isCorrect: false },
-          { text: "政府對投資資本收益所徵收的累進稅率", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "複利即『利滾利』，將獲得的利息再投入本金中繼續計算利息，時間越長財富增長速度越快。"
-      },
-
-      // --- 3. 基礎會計 ---
-      {
-        id: 301,
         category: "基礎會計",
         question: "根據「業務個體概念」（Business Entity Concept），東主從獨資企業抽取現金作私人用途，會計上應記為以下哪項？",
         options: [
@@ -610,55 +598,17 @@
         ],
         reward: 1000,
         explanation: "業務個體概念規定企業與東主的財務必須分開處理，東主提取資金應列為『提款』以減少所有者權益。"
-      },
-      {
-        id: 302,
-        category: "基礎會計",
-        question: "基本會計等式（Accounting Equation）的標準表達方式是：",
-        options: [
-          { text: "資產 = 負債 + 所有者權益", isCorrect: true },
-          { text: "資產 + 負債 = 所有者權益", isCorrect: false },
-          { text: "負債 = 資產 + 所有者權益", isCorrect: false },
-          { text: "所有者權益 = 收入 - 費用", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "基本會計等式為：資產 (Assets) = 負債 (Liabilities) + 所有者權益 (Capital)。"
-      },
-      {
-        id: 303,
-        category: "基礎會計",
-        question: "「歷史成本概念」（Historical Cost Concept）是指資產應以什麼價值在財務報表中記錄？",
-        options: [
-          { text: "購買時的實際取得成本", isCorrect: true },
-          { text: "現時的市場重置價值", isCorrect: false },
-          { text: "預期的未來賣出價格", isCorrect: false },
-          { text: "扣除清算費用後的淨值", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "歷史成本概念規定資產應以交易發生時的實際購置成本入賬，不受後續市場價格波動影響。"
-      },
-      {
-        id: 304,
-        category: "基礎會計",
-        question: "下列哪項屬於企業的「流動資產」(Current Asset)？",
-        options: [
-          { text: "應收賬款 (Trade Debtors / Accounts Receivable)", isCorrect: true },
-          { text: "辦公室物業 (Premises)", isCorrect: false },
-          { text: "機器與設備 (Machinery)", isCorrect: false },
-          { text: "應付賬款 (Trade Creditors / Accounts Payable)", isCorrect: false }
-        ],
-        reward: 1000,
-        explanation: "應收賬款預計會在一年（或一個營業週期）內變現，故屬於流動資產。"
       }
     ];
 
+    let bafsQuestions = [];
     let currentSelectedCategory = "商業環境";
     let filteredQuestions = [];
     let currentQuestionIndexInFiltered = 0;
     let currentShuffledOptions = [];
     let isAnsweredCurrent = false;
 
-    // 🎲 Fisher-Yates 陣列隨機洗牌演算法
+    // 洗牌演算法
     function shuffleArray(array) {
       const arr = [...array];
       for (let i = arr.length - 1; i > 0; i--) {
@@ -668,11 +618,35 @@
       return arr;
     }
 
+    // 監聽並加載 Firestore 題庫
+    function setupQuestionsRealtime() {
+      const qCol = collection(db, 'questions');
+      unsubscribeQuestions = onSnapshot(qCol, async (snapshot) => {
+        if (snapshot.empty) {
+          // 若 Firestore 題庫為空，自動寫入預設題目種子
+          for (const q of defaultQuestions) {
+            await addDoc(qCol, q);
+          }
+          return;
+        }
+
+        bafsQuestions = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+
+        loadQuestionForSelectedCategory();
+
+        if (currentUserData.is_admin) {
+          renderAdminQuestionsList();
+        }
+      });
+    }
+
     // 選擇題目分類
     window.selectQuestionCategory = function(cat, btnElement) {
       currentSelectedCategory = cat;
 
-      // 更新按鈕樣式
       document.querySelectorAll('.cat-tab-btn').forEach(btn => {
         btn.className = "cat-tab-btn py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
       });
@@ -683,20 +657,28 @@
 
     function loadQuestionForSelectedCategory() {
       filteredQuestions = bafsQuestions.filter(q => q.category === currentSelectedCategory);
-      if (filteredQuestions.length === 0) return;
+      const qContainer = document.getElementById('question-text');
+      const optContainer = document.getElementById('options-container');
+
+      if (filteredQuestions.length === 0) {
+        document.getElementById('question-category').textContent = `DSE BAFS：${currentSelectedCategory}`;
+        qContainer.textContent = "此分類暫無題目，請等待老師於後台新增。";
+        optContainer.innerHTML = '';
+        document.getElementById('answer-feedback').classList.add('hidden');
+        document.getElementById('btn-next-question').classList.add('hidden');
+        return;
+      }
 
       currentQuestionIndexInFiltered = Math.floor(Math.random() * filteredQuestions.length);
       renderBAFSQuestion();
     }
 
-    // 渲染 BAFS 題目
     function renderBAFSQuestion() {
-      if (filteredQuestions.length === 0) {
-        filteredQuestions = bafsQuestions.filter(q => q.category === currentSelectedCategory);
-      }
+      if (filteredQuestions.length === 0) return;
 
       const q = filteredQuestions[currentQuestionIndexInFiltered];
       document.getElementById('question-category').textContent = `DSE BAFS 卷一：${q.category}`;
+      document.getElementById('question-reward-tag').textContent = `獎酬：+$${q.reward || 1000} (待出糧)`;
       document.getElementById('question-text').textContent = q.question;
 
       const optionsContainer = document.getElementById('options-container');
@@ -707,7 +689,7 @@
       document.getElementById('btn-next-question').classList.add('hidden');
       isAnsweredCurrent = false;
 
-      currentShuffledOptions = shuffleArray(q.options);
+      currentShuffledOptions = shuffleArray(q.options || []);
       const labels = ['A', 'B', 'C', 'D'];
 
       currentShuffledOptions.forEach((opt, index) => {
@@ -720,7 +702,6 @@
       });
     }
 
-    // 檢查 BAFS 答案
     async function checkBAFSAnswer(shuffledIndex, clickedKey) {
       if (isAnsweredCurrent) return;
       isAnsweredCurrent = true;
@@ -730,29 +711,29 @@
       const feedback = document.getElementById('answer-feedback');
       feedback.classList.remove('hidden');
 
-      const correctOption = q.options.find(o => o.isCorrect);
+      const correctOption = (q.options || []).find(o => o.isCorrect);
+      const rewardVal = q.reward || 1000;
 
-      if (selectedOption.isCorrect) {
+      if (selectedOption && selectedOption.isCorrect) {
         feedback.className = "text-xs mt-2 p-2.5 rounded-lg bg-green-50 border border-green-200 text-green-700 font-bold";
-        feedback.innerHTML = `🎉 答對了！(你選擇了 ${clickedKey}: ${selectedOption.text})<br><span class="font-normal text-[11px] text-green-600">${q.explanation}</span><br><strong>+$${q.reward} 已記入本月待出糧金額！</strong>`;
+        feedback.innerHTML = `🎉 答對了！(你選擇了 ${clickedKey}: ${selectedOption.text})<br><span class="font-normal text-[11px] text-green-600">${q.explanation || ''}</span><br><strong>+$${rewardVal} 已記入本月待出糧金額！</strong>`;
         
         const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, { accrued_salary: increment(q.reward) });
+        await updateDoc(userRef, { accrued_salary: increment(rewardVal) });
         await addDoc(collection(db, 'ledger'), {
           student_email: currentUser.email,
-          amount: q.reward,
+          amount: rewardVal,
           reason: `答對 BAFS 題目 (${q.category})`,
           created_at: new Date()
         });
       } else {
         feedback.className = "text-xs mt-2 p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700";
-        feedback.innerHTML = `❌ 答錯了！正確答案是：<strong>${correctOption.text}</strong><br><span class="text-[11px]">${q.explanation}</span>`;
+        feedback.innerHTML = `❌ 答錯了！正確答案是：<strong>${correctOption ? correctOption.text : ''}</strong><br><span class="text-[11px]">${q.explanation || ''}</span>`;
       }
 
       document.getElementById('btn-next-question').classList.remove('hidden');
     }
 
-    // 下一題按鈕（同分類隨機抽題）
     document.getElementById('btn-next-question').addEventListener('click', () => {
       if (filteredQuestions.length <= 1) {
         renderBAFSQuestion();
@@ -765,6 +746,129 @@
       currentQuestionIndexInFiltered = nextIndex;
       renderBAFSQuestion();
     });
+
+    // 👑 老師題目後台管理 CRUD 邏輯
+    function renderAdminQuestionsList() {
+      const qListContainer = document.getElementById('admin-questions-list');
+      qListContainer.innerHTML = '';
+
+      if (bafsQuestions.length === 0) {
+        qListContainer.innerHTML = '<p class="text-slate-400 text-center py-2">目前資料庫無任何題目。</p>';
+        return;
+      }
+
+      bafsQuestions.forEach(q => {
+        const item = document.createElement('div');
+        item.className = "flex justify-between items-center p-2 bg-slate-50 border border-slate-200 rounded";
+        item.innerHTML = `
+          <div class="truncate mr-2">
+            <span class="text-[9px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded mr-1">${q.category}</span>
+            <span class="font-semibold text-slate-700">${q.question}</span>
+          </div>
+          <div class="flex items-center gap-1 whitespace-nowrap">
+            <button onclick="editQuestionModal('${q.id}')" class="text-[10px] bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-2 py-0.5 rounded font-bold">編輯</button>
+            <button onclick="deleteQuestion('${q.id}')" class="text-[10px] bg-red-100 text-red-600 hover:bg-red-200 px-2 py-0.5 rounded font-bold">刪除</button>
+          </div>
+        `;
+        qListContainer.appendChild(item);
+      });
+    }
+
+    document.getElementById('btn-open-add-q').addEventListener('click', () => {
+      document.getElementById('editing-q-id').value = '';
+      document.getElementById('q-modal-title').textContent = '➕ 新增題目';
+      document.getElementById('q-input-category').value = '商業環境';
+      document.getElementById('q-input-text').value = '';
+      document.getElementById('q-input-opt1').value = '';
+      document.getElementById('q-input-opt2').value = '';
+      document.getElementById('q-input-opt3').value = '';
+      document.getElementById('q-input-opt4').value = '';
+      document.getElementById('q-input-exp').value = '';
+      document.getElementById('q-input-reward').value = '1000';
+      document.getElementById('q-modal').classList.remove('hidden');
+    });
+
+    window.editQuestionModal = function(qId) {
+      const q = bafsQuestions.find(item => item.id === qId);
+      if (!q) return;
+
+      document.getElementById('editing-q-id').value = q.id;
+      document.getElementById('q-modal-title').textContent = '✏️ 編輯題目';
+      document.getElementById('q-input-category').value = q.category || '商業環境';
+      document.getElementById('q-input-text').value = q.question || '';
+
+      const correctOpt = (q.options || []).find(o => o.isCorrect) || { text: '' };
+      const wrongOpts = (q.options || []).filter(o => !o.isCorrect);
+
+      document.getElementById('q-input-opt1').value = correctOpt.text || '';
+      document.getElementById('q-input-opt2').value = wrongOpts[0] ? wrongOpts[0].text : '';
+      document.getElementById('q-input-opt3').value = wrongOpts[1] ? wrongOpts[1].text : '';
+      document.getElementById('q-input-opt4').value = wrongOpts[2] ? wrongOpts[2].text : '';
+
+      document.getElementById('q-input-exp').value = q.explanation || '';
+      document.getElementById('q-input-reward').value = q.reward || 1000;
+
+      document.getElementById('q-modal').classList.remove('hidden');
+    };
+
+    document.getElementById('btn-cancel-q').addEventListener('click', () => {
+      document.getElementById('q-modal').classList.add('hidden');
+    });
+
+    document.getElementById('btn-save-q').addEventListener('click', async () => {
+      const editingId = document.getElementById('editing-q-id').value;
+      const category = document.getElementById('q-input-category').value;
+      const question = document.getElementById('q-input-text').value.trim();
+      const opt1 = document.getElementById('q-input-opt1').value.trim();
+      const opt2 = document.getElementById('q-input-opt2').value.trim();
+      const opt3 = document.getElementById('q-input-opt3').value.trim();
+      const opt4 = document.getElementById('q-input-opt4').value.trim();
+      const explanation = document.getElementById('q-input-exp').value.trim();
+      const reward = parseInt(document.getElementById('q-input-reward').value) || 1000;
+
+      if (!question || !opt1 || !opt2 || !opt3 || !opt4) {
+        alert("請完整填寫題目文字及全部 4 個選項！");
+        return;
+      }
+
+      const optionsData = [
+        { text: opt1, isCorrect: true },
+        { text: opt2, isCorrect: false },
+        { text: opt3, isCorrect: false },
+        { text: opt4, isCorrect: false }
+      ];
+
+      const payload = {
+        category,
+        question,
+        options: optionsData,
+        explanation,
+        reward
+      };
+
+      try {
+        if (editingId) {
+          await updateDoc(doc(db, 'questions', editingId), payload);
+          alert("🎉 題目更新成功！");
+        } else {
+          await addDoc(collection(db, 'questions'), payload);
+          alert("🎉 成功新增題目！");
+        }
+        document.getElementById('q-modal').classList.add('hidden');
+      } catch (err) {
+        alert("儲存失敗：" + err.message);
+      }
+    });
+
+    window.deleteQuestion = async function(qId) {
+      if (!confirm("確定要刪除這道題目嗎？此動作無法復原。")) return;
+      try {
+        await deleteDoc(doc(db, 'questions', qId));
+        alert("已成功刪除該題目！");
+      } catch (err) {
+        alert("刪除失敗：" + err.message);
+      }
+    };
 
     // 切換分頁
     window.switchTab = function(tabId, btnElement) {
@@ -795,7 +899,6 @@
       }
     });
 
-    // 登出
     btnLogout.addEventListener('click', () => signOut(auth));
 
     // 監聽登入狀態
@@ -806,9 +909,9 @@
         mainDashboard.classList.remove('hidden');
         bottomNav.classList.remove('hidden');
 
+        setupQuestionsRealtime();
         setupUserRealtime(user);
         loadLedger(user.email);
-        loadQuestionForSelectedCategory();
         fetchRealHSI();
 
         setInterval(() => {
@@ -821,6 +924,7 @@
         currentUser = null;
         if (unsubscribeUserDoc) unsubscribeUserDoc();
         if (unsubscribeLedger) unsubscribeLedger();
+        if (unsubscribeQuestions) unsubscribeQuestions();
         loginCard.classList.remove('hidden');
         mainDashboard.classList.add('hidden');
         bottomNav.classList.add('hidden');
@@ -890,6 +994,7 @@
             userRoleBadge.textContent = "老師/管理員";
             userRoleBadge.className = "text-[10px] inline-block bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold";
             document.getElementById('admin-panel').classList.remove('hidden');
+            renderAdminQuestionsList();
           } else {
             userRoleBadge.textContent = "學生";
             userRoleBadge.className = "text-[10px] inline-block bg-slate-100 text-slate-600 px-2 py-0.5 rounded";
@@ -919,7 +1024,7 @@
       const hkMins = now.getMinutes() < 30 ? "00" : "30";
       document.getElementById('slot-time-tag').textContent = `時段：${hkHours}:${hkMins} 最新報價`;
 
-      const activeEvent = getCurrentBiweeklyEvent();
+      const activeEvent = getCurrentDailyEvent();
       document.getElementById('event-title-display').textContent = activeEvent.title;
       document.getElementById('event-explanation-box').innerHTML = activeEvent.explanation;
 
